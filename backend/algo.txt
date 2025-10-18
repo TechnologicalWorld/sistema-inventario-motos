@@ -1,0 +1,14 @@
+"role": "gerente",
+"ci": "12345678",
+"paterno": "Reyes",
+"materno": "Barja",
+"nombres": "Kae",
+"fechaNacimiento": "1993-27-12",
+"genero": "M",
+"telefono": "73299947"
+
+
+"fechaContratacion": "1993-12-23",
+"email": "caereyes0@gmail.com",
+"direccion": "kalle k",
+"password": "kdekae",
