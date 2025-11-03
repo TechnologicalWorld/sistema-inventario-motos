@@ -3,7 +3,7 @@
 "paterno": "Reyes",
 "materno": "Barja",
 "nombres": "Kae",
-"fechaNacimiento": "1993-27-12",
+"fecha_naci": "1993-27-12",
 "genero": "M",
 "telefono": "73299947"
 

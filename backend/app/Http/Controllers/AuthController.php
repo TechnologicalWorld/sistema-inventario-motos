@@ -23,7 +23,7 @@ class AuthController extends Controller
             'paterno' => 'required|string|max:255',
             'materno' => 'required|string|max:255',
             'nombres' => 'required|string|max:255',
-            'fechaNacimiento' => 'required|date',
+            'fecha_naci' => 'required|date',
             'genero' => 'required|in:M,F',
             'telefono' => 'required|string|max:20',
         ]);
@@ -53,7 +53,7 @@ class AuthController extends Controller
                 'paterno' => $request->paterno,
                 'materno' => $request->materno,
                 'nombres' => $request->nombres,
-                'fechaNacimiento' => $request->fechaNacimiento,
+                'fecha_naci' => $request->fecha_naci,
                 'genero' => $request->genero,
                 'telefono' => $request->telefono,
             ]);

@@ -10,15 +10,14 @@ class Gerente extends Model
 {
     use HasFactory, HasApiTokens;
 
-    protected $table = "gerente";
-
+    protected $table = 'gerente';
     protected $primaryKey = 'idGerente';
     public $incrementing = false;
     protected $keyType = 'int';
 
     protected $fillable = [
         'idGerente',
-        'fechaContratacion',
+        'fecha_contratacion',
         'email',
         'direccion',
         'password'
@@ -30,11 +29,46 @@ class Gerente extends Model
 
     protected $casts = [
         'password' => 'hashed',
+        'fecha_contratacion' => 'date'
     ];
 
-    // Relación con Persona
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'idGerente', 'idPersona');
+    }
+
+    public function compras()
+    {
+        return $this->hasMany(Compra::class, 'idGerente');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'idUsuario', 'idGerente');
+    }
+
+    public function getNombreCompletoAttribute()
+    {
+        return $this->persona ? $this->persona->nombre_completo : '';
+    }
+
+    public function getCiAttribute()
+    {
+        return $this->persona ? $this->persona->ci : '';
+    }
+
+    public function getTelefonoAttribute()
+    {
+        return $this->persona ? $this->persona->telefono : '';
+    }
+
+    public function getTotalComprasAttribute()
+    {
+        return $this->compras()->count();
+    }
+
+    public function getMontoTotalComprasAttribute()
+    {
+        return $this->compras()->sum('totalPago');
     }
 }

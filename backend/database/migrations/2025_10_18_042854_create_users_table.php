@@ -14,12 +14,12 @@ return new class extends Migration
             $table->string('password');
             $table->string('direccion')->nullable();
             $table->date('fecha_contratacion')->nullable();
-            $table->enum('tipo', ['gerente', 'empleado'])->default('empleado');
+            $table->enum('tipo', ['gerente', 'empleado', 'propietario'])->default('empleado');
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
 
-            $table->foreign('idUsuario')->references('idPersona')->on('personas')->onDelete('cascade');
+            $table->foreign('idUsuario')->references('idPersona')->on('persona')->onDelete('cascade');
         });
     }
 

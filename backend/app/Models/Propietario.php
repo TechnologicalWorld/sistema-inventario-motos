@@ -8,16 +8,43 @@ use Illuminate\Database\Eloquent\Model;
 class Propietario extends Model
 {
     use HasFactory;
-    protected $table = "propietario";
+
+    protected $table = 'propietario';
     protected $primaryKey = 'idPropietario';
     public $incrementing = false;
     protected $keyType = 'int';
 
-    protected $fillable = ['idPropietario'];
+    protected $fillable = [
+        'idPropietario',
+        'email',
+        'password'
+    ];
 
-    // Relación con Persona
+    protected $hidden = [
+        'password'
+    ];
+
+    protected $casts = [
+        'password' => 'hashed'
+    ];
+
     public function persona()
     {
-        return $this->belongsTo(Persona::class,'idPropietario', 'idPersona');
+        return $this->belongsTo(Persona::class, 'idPropietario', 'idPersona');
+    }
+
+    public function getNombreCompletoAttribute()
+    {
+        return $this->persona ? $this->persona->nombre_completo : '';
+    }
+
+    public function getCiAttribute()
+    {
+        return $this->persona ? $this->persona->ci : '';
+    }
+
+    public function getTelefonoAttribute()
+    {
+        return $this->persona ? $this->persona->telefono : '';
     }
 }
