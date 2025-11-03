@@ -25,7 +25,7 @@ class VentaSeeder extends Seeder
         $ventas = [
             [
                 'fecha' => '2024-01-18 10:30:00',
-                'montoTotal' => 0, // Se calculará
+                'montoTotal' => 0, 
                 'metodoPago' => 'efectivo',
                 'descripcion' => 'Venta de repuestos y aceite',
                 'idCliente' => $clientes[0]->idCliente,
@@ -49,7 +49,7 @@ class VentaSeeder extends Seeder
             ],
             [
                 'fecha' => '2024-01-22 16:45:00',
-                'montoTotal' => 0, // Se calculará
+                'montoTotal' => 0, 
                 'metodoPago' => 'tarjeta',
                 'descripcion' => 'Venta de casco y accesorios',
                 'idCliente' => $clientes[1]->idCliente,
@@ -66,7 +66,7 @@ class VentaSeeder extends Seeder
             ],
             [
                 'fecha' => '2024-02-10 11:20:00',
-                'montoTotal' => 0, // Se calculará
+                'montoTotal' => 0, 
                 'metodoPago' => 'transferencia',
                 'descripcion' => 'Venta de neumáticos',
                 'idCliente' => $clientes[2]->idCliente,
@@ -153,7 +153,7 @@ class VentaSeeder extends Seeder
 
         for ($j = 0; $j < $numDetalles; $j++) {
             $producto = $productos->where('stock', '>', 0)->random();
-            $cantidad = rand(1, min(5, $producto->stock)); // No vender más del stock disponible
+            $cantidad = rand(1, min(5, $producto->stock));
             $precioUnitario = $producto->precioVenta;
             $subTotal = $precioUnitario * $cantidad;
 
