@@ -172,7 +172,7 @@ class PersonaSeeder extends Seeder
         for ($i = 0; $i < 15; $i++) {
             $persona = Persona::factory()->create();
             
-            $role = rand(1, 3); // Solo cliente, empleado o gerente adicional
+            $role = rand(1, 3);
             
             switch ($role) {
                 case 1:

@@ -61,9 +61,5 @@ class DetalleCompraSeeder extends Seeder
                 $compra->save();
             }
         }
-
-        echo "DetalleCompraSeeder completado. \n";
-        echo "- " . $detallesCreados . " detalles de compra adicionales creados\n";
-        echo "- Total detalles de compra: " . DetalleCompra::count() . "\n";
     }
 }

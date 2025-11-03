@@ -51,7 +51,7 @@ class MovimientoInventarioSeeder extends Seeder
                 'observacion' => 'Uso interno del taller',
                 'fechaMovimiento' => '2024-02-05 16:45:00',
                 'idEmpleado' => $empleados[2]->idEmpleado,
-                'idProducto' => $productos[10]->idProducto, // Pastillas freno
+                'idProducto' => $productos[10]->idProducto, 
             ]
         ];
 

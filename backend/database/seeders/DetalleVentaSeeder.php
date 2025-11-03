@@ -63,9 +63,5 @@ class DetalleVentaSeeder extends Seeder
                 $venta->save();
             }
         }
-
-        echo "DetalleVentaSeeder completado. \n";
-        echo "- " . $detallesCreados . " detalles de venta adicionales creados\n";
-        echo "- Total detalles de venta: " . DetalleVenta::count() . "\n";
     }
 }

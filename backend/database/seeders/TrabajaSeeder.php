@@ -17,19 +17,19 @@ class TrabajaSeeder extends Seeder
         $asignaciones = [
             // Asignaciones fijas para empleados principales
             [
-                'idEmpleado' => $empleados[0]->idEmpleado, // Juan Perez
+                'idEmpleado' => $empleados[0]->idEmpleado, 
                 'idDepartamento' => $departamentos->where('nombre', 'Ventas')->first()->idDepartamento,
                 'fecha' => '2023-02-01',
                 'observacion' => 'Asignación inicial como vendedor'
             ],
             [
-                'idEmpleado' => $empleados[1]->idEmpleado, // Maria Lopez
+                'idEmpleado' => $empleados[1]->idEmpleado,
                 'idDepartamento' => $departamentos->where('nombre', 'Almacén')->first()->idDepartamento,
                 'fecha' => '2023-03-15',
                 'observacion' => 'Responsable de control de inventario'
             ],
             [
-                'idEmpleado' => $empleados[2]->idEmpleado, // Luis Rodriguez
+                'idEmpleado' => $empleados[2]->idEmpleado, 
                 'idDepartamento' => $departamentos->where('nombre', 'Taller')->first()->idDepartamento,
                 'fecha' => '2023-01-20',
                 'observacion' => 'Mecánico especializado'
@@ -41,7 +41,7 @@ class TrabajaSeeder extends Seeder
         }
 
         // Asignaciones aleatorias para otros empleados
-        $otrosEmpleados = $empleados->slice(3); // Excluye los primeros 3 ya asignados
+        $otrosEmpleados = $empleados->slice(3); 
 
         foreach ($otrosEmpleados as $empleado) {
             $departamento = $departamentos->random();
@@ -56,7 +56,7 @@ class TrabajaSeeder extends Seeder
 
         // Algunos empleados en múltiples departamentos
         if ($empleados->count() > 3) {
-            $empleadoMulti = $empleados[0]; // Juan Perez también en Marketing
+            $empleadoMulti = $empleados[0]; 
             Trabaja::create([
                 'idEmpleado' => $empleadoMulti->idEmpleado,
                 'idDepartamento' => $departamentos->where('nombre', 'Marketing')->first()->idDepartamento,

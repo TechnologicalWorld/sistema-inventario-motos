@@ -31,13 +31,13 @@ class CompraSeeder extends Seeder
                 'idGerente' => $gerentes[0]->idGerente,
                 'detalles' => [
                     [
-                        'idProducto' => $productos[2]->idProducto, // Kit de Pistón
+                        'idProducto' => $productos[2]->idProducto, 
                         'precioUnitario' => 220.00,
                         'cantidad' => 10,
                         'subTotal' => 2200.00
                     ],
                     [
-                        'idProducto' => $productos[3]->idProducto, // Cadena de Tiempo
+                        'idProducto' => $productos[3]->idProducto,
                         'precioUnitario' => 120.00,
                         'cantidad' => 15,
                         'subTotal' => 1800.00
@@ -48,17 +48,17 @@ class CompraSeeder extends Seeder
                 'fecha' => '2024-01-20 14:15:00',
                 'totalPago' => 0, // Se calculará
                 'observacion' => 'Compra de lubricantes y aceites',
-                'idEmpresaP' => $proveedores[5]->idEmpresaP, // Lubricantes Mobil
+                'idEmpresaP' => $proveedores[5]->idEmpresaP,
                 'idGerente' => $gerentes[0]->idGerente,
                 'detalles' => [
                     [
-                        'idProducto' => $productos[4]->idProducto, // Aceite Mobil
+                        'idProducto' => $productos[4]->idProducto, 
                         'precioUnitario' => 28.00,
                         'cantidad' => 40,
                         'subTotal' => 1120.00
                     ],
                     [
-                        'idProducto' => $productos[5]->idProducto, // Aceite Castrol
+                        'idProducto' => $productos[5]->idProducto,
                         'precioUnitario' => 42.00,
                         'cantidad' => 25,
                         'subTotal' => 1050.00
@@ -67,19 +67,19 @@ class CompraSeeder extends Seeder
             ],
             [
                 'fecha' => '2024-02-05 11:00:00',
-                'totalPago' => 0, // Se calculará
+                'totalPago' => 0,
                 'observacion' => 'Compra de equipamiento de seguridad',
-                'idEmpresaP' => $proveedores[7]->idEmpresaP, // Cascos Safety First
+                'idEmpresaP' => $proveedores[7]->idEmpresaP,
                 'idGerente' => $gerentes[0]->idGerente,
                 'detalles' => [
                     [
-                        'idProducto' => $productos[6]->idProducto, // Casco LS2
+                        'idProducto' => $productos[6]->idProducto, 
                         'precioUnitario' => 320.00,
                         'cantidad' => 8,
                         'subTotal' => 2560.00
                     ],
                     [
-                        'idProducto' => $productos[7]->idProducto, // Casco MT
+                        'idProducto' => $productos[7]->idProducto, 
                         'precioUnitario' => 480.00,
                         'cantidad' => 5,
                         'subTotal' => 2400.00

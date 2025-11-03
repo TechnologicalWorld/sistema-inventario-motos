@@ -32,14 +32,14 @@ class VentaSeeder extends Seeder
                 'idEmpleado' => $empleados[0]->idEmpleado,
                 'detalles' => [
                     [
-                        'idProducto' => $productos[2]->idProducto, // Kit de Pistón
+                        'idProducto' => $productos[2]->idProducto,
                         'cantidad' => 2,
                         'precioUnitario' => 350.00,
                         'subTotal' => 700.00,
                         'descripcion' => 'Kit pistón 125cc'
                     ],
                     [
-                        'idProducto' => $productos[4]->idProducto, // Aceite Mobil
+                        'idProducto' => $productos[4]->idProducto, 
                         'cantidad' => 3,
                         'precioUnitario' => 45.00,
                         'subTotal' => 135.00,
@@ -56,7 +56,7 @@ class VentaSeeder extends Seeder
                 'idEmpleado' => $empleados[0]->idEmpleado,
                 'detalles' => [
                     [
-                        'idProducto' => $productos[6]->idProducto, // Casco LS2
+                        'idProducto' => $productos[6]->idProducto, 
                         'cantidad' => 1,
                         'precioUnitario' => 450.00,
                         'subTotal' => 450.00,
@@ -73,14 +73,14 @@ class VentaSeeder extends Seeder
                 'idEmpleado' => $empleados[1]->idEmpleado,
                 'detalles' => [
                     [
-                        'idProducto' => $productos[8]->idProducto, // Llanta Delantera
+                        'idProducto' => $productos[8]->idProducto, 
                         'cantidad' => 1,
                         'precioUnitario' => 220.00,
                         'subTotal' => 220.00,
                         'descripcion' => 'Llanta delantera 2.75-18'
                     ],
                     [
-                        'idProducto' => $productos[9]->idProducto, // Llanta Trasera
+                        'idProducto' => $productos[9]->idProducto, 
                         'cantidad' => 1,
                         'precioUnitario' => 280.00,
                         'subTotal' => 280.00,
