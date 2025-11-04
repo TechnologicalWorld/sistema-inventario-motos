@@ -5,55 +5,85 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DetalleVenta extends Model
+class Venta extends Model
 {
     use HasFactory;
 
-    protected $table = 'detalle_venta';
-    protected $primaryKey = 'idDetalleVenta';
+    protected $table = 'venta';
+    protected $primaryKey = 'idVenta';
 
     protected $fillable = [
-        'cantidad',
-        'precioUnitario',
-        'subTotal',
+        'fecha',
+        'montoTotal',
+        'metodoPago',
         'descripcion',
-        'idVenta',
-        'idProducto'
+        'idCliente',
+        'idEmpleado'
     ];
 
     protected $casts = [
-        'precioUnitario' => 'decimal:2',
-        'subTotal' => 'decimal:2',
-        'cantidad' => 'integer'
+        'fecha' => 'datetime',
+        'montoTotal' => 'decimal:2'
     ];
 
-    public function venta()
+    public function cliente()
     {
-        return $this->belongsTo(Venta::class, 'idVenta');
+        return $this->belongsTo(Cliente::class, 'idCliente');
     }
 
-    public function producto()
+    public function empleado()
     {
-        return $this->belongsTo(Producto::class, 'idProducto');
+        return $this->belongsTo(Empleado::class, 'idEmpleado');
     }
 
-    public function getNombreProductoAttribute()
+    public function detalleVentas()
     {
-        return $this->producto ? $this->producto->nombre : 'Producto eliminado';
+        return $this->hasMany(DetalleVenta::class, 'idVenta');
     }
 
-    public function getCodigoProductoAttribute()
+    public function getNombreClienteAttribute()
     {
-        return $this->producto ? $this->producto->codigoProducto : '';
+        return $this->cliente ? $this->cliente->nombre_completo : 'Cliente no registrado';
     }
 
-    public function getPrecioCompraAttribute()
+    public function getNombreEmpleadoAttribute()
     {
-        return $this->producto ? $this->producto->precioCompra : 0;
+        return $this->empleado ? $this->empleado->nombre_completo : '';
     }
 
-    public function getGananciaAttribute()
+    public function getCantidadProductosAttribute()
     {
-        return ($this->precioUnitario - $this->precio_compra) * $this->cantidad;
+        return $this->detalleVentas->sum('cantidad');
+    }
+
+    public function getMetodoPagoTextoAttribute()
+    {
+        return ucfirst($this->metodoPago);
+    }
+
+    public function scopePorFecha($query, $fechaInicio, $fechaFin = null)
+    {
+        $query->whereDate('fecha', '>=', $fechaInicio);
+        
+        if ($fechaFin) {
+            $query->whereDate('fecha', '<=', $fechaFin);
+        }
+        
+        return $query;
+    }
+
+    public function scopePorEmpleado($query, $empleadoId)
+    {
+        return $query->where('idEmpleado', $empleadoId);
+    }
+
+    public function scopePorCliente($query, $clienteId)
+    {
+        return $query->where('idCliente', $clienteId);
+    }
+
+    public function scopePorMetodoPago($query, $metodoPago)
+    {
+        return $query->where('metodoPago', $metodoPago);
     }
 }
