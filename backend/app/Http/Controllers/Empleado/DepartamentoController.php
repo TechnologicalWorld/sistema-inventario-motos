@@ -9,22 +9,43 @@ use Illuminate\Http\Request;
 
 class DepartamentoController extends Controller
 {
-    public function miDepartamento()
+    public function miDepartamento(Request $request)
     {
-        $empleadoId = auth()->id();
-        
-        $departamento = Departamento::whereHas('empleados', function($query) use ($empleadoId) {
-            $query->where('idEmpleado', $empleadoId);
-        })->first();
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
 
-        $historialAsignaciones = Trabaja::with('departamento')
-            ->where('idEmpleado', $empleadoId)
-            ->orderBy('fecha', 'desc')
-            ->get();
+            $empleadoId = $user->idUsuario;
+            
+            $departamento = Departamento::whereHas('empleados', function($query) use ($empleadoId) {
+                $query->where('idEmpleado', $empleadoId);
+            })->first();
 
-        return response()->json([
-            'departamento_actual' => $departamento,
-            'historial_asignaciones' => $historialAsignaciones
-        ]);
+            $historialAsignaciones = Trabaja::with('departamento')
+                ->where('idEmpleado', $empleadoId)
+                ->orderBy('fecha', 'desc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'departamento_actual' => $departamento,
+                    'historial_asignaciones' => $historialAsignaciones
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener información del departamento',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 }

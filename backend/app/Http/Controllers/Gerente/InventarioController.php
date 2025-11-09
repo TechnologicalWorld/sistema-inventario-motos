@@ -7,32 +7,46 @@ use App\Models\Producto;
 use App\Models\Categoria;
 use App\Models\MovimientoInventario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class InventarioController extends Controller
 {
     // CRUD Productos
     public function indexProductos(Request $request)
     {
-        $query = Producto::with('categoria');
+        try {
+            $query = Producto::with('categoria');
 
-        if ($request->has('search')) {
-            $query->where('nombre', 'like', "%{$request->search}%")
-                  ->orWhere('codigoProducto', 'like', "%{$request->search}%");
+            if ($request->has('search')) {
+                $query->where('nombre', 'like', "%{$request->search}%")
+                      ->orWhere('codigoProducto', 'like', "%{$request->search}%");
+            }
+
+            if ($request->has('categoria')) {
+                $query->where('idCategoria', $request->categoria);
+            }
+
+            $productos = $query->orderBy('nombre')->paginate(15);
+
+            return response()->json([
+                'success' => true,
+                'data' => $productos
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener los productos',
+                'details' => $e->getMessage()
+            ], 500);
         }
-
-        if ($request->has('categoria')) {
-            $query->where('idCategoria', $request->categoria);
-        }
-
-        $productos = $query->orderBy('nombre')->paginate(15);
-
-        return response()->json($productos);
     }
 
     public function storeProducto(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:255',
             'codigoProducto' => 'required|string|unique:producto,codigoProducto',
             'descripcion' => 'nullable|string',
@@ -44,110 +58,232 @@ class InventarioController extends Controller
             'idCategoria' => 'required|exists:categoria,idCategoria'
         ]);
 
-        $producto = Producto::create($request->all());
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-        return response()->json([
-            'message' => 'Producto creado correctamente',
-            'producto' => $producto
-        ], 201);
+        try {
+            $producto = Producto::create($request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Producto creado correctamente',
+                'data' => $producto
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al crear el producto',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updateProducto(Request $request, $id)
     {
-        $producto = Producto::findOrFail($id);
+        try {
+            $producto = Producto::findOrFail($id);
 
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'codigoProducto' => 'required|string|unique:producto,codigoProducto,' . $id . ',idProducto',
-            'descripcion' => 'nullable|string',
-            'precioVenta' => 'required|numeric|min:0',
-            'precioCompra' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'stockMinimo' => 'required|integer|min:0',
-            'estado' => 'required|in:activo,inactivo',
-            'idCategoria' => 'required|exists:categoria,idCategoria'
-        ]);
+            $validator = Validator::make($request->all(), [
+                'nombre' => 'required|string|max:255',
+                'codigoProducto' => 'required|string|unique:producto,codigoProducto,' . $id . ',idProducto',
+                'descripcion' => 'nullable|string',
+                'precioVenta' => 'required|numeric|min:0',
+                'precioCompra' => 'required|numeric|min:0',
+                'stock' => 'required|integer|min:0',
+                'stockMinimo' => 'required|integer|min:0',
+                'estado' => 'required|in:activo,inactivo',
+                'idCategoria' => 'required|exists:categoria,idCategoria'
+            ]);
 
-        $producto->update($request->all());
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
 
-        return response()->json([
-            'message' => 'Producto actualizado correctamente',
-            'producto' => $producto
-        ]);
+            $producto->update($request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Producto actualizado correctamente',
+                'data' => $producto
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Producto no encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al actualizar el producto',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroyProducto($id)
     {
-        $producto = Producto::findOrFail($id);
-        
-        // Verificar si tiene ventas o compras asociadas
-        if ($producto->detalleVentas()->exists() || $producto->detalleCompras()->exists()) {
+        try {
+            $producto = Producto::findOrFail($id);
+            
+            if ($producto->detalleVentas()->exists() || $producto->detalleCompras()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se puede eliminar el producto porque tiene ventas o compras asociadas'
+                ], 422);
+            }
+
+            $producto->delete();
+
             return response()->json([
-                'message' => 'No se puede eliminar el producto porque tiene ventas o compras asociadas'
-            ], 422);
+                'success' => true,
+                'message' => 'Producto eliminado correctamente'
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Producto no encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al eliminar el producto',
+                'details' => $e->getMessage()
+            ], 500);
         }
-
-        $producto->delete();
-
-        return response()->json([
-            'message' => 'Producto eliminado correctamente'
-        ]);
     }
 
     // CRUD Categorías
     public function indexCategorias()
     {
-        $categorias = Categoria::withCount('productos')->get();
-        return response()->json($categorias);
+        try {
+            $categorias = Categoria::withCount('productos')->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $categorias
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener las categorías',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function storeCategoria(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:255|unique:categoria,nombre',
             'descripcion' => 'nullable|string'
         ]);
 
-        $categoria = Categoria::create($request->all());
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-        return response()->json([
-            'message' => 'Categoría creada correctamente',
-            'categoria' => $categoria
-        ], 201);
+        try {
+            $categoria = Categoria::create($request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categoría creada correctamente',
+                'data' => $categoria
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al crear la categoría',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updateCategoria(Request $request, $id)
     {
-        $categoria = Categoria::findOrFail($id);
+        try {
+            $categoria = Categoria::findOrFail($id);
 
-        $request->validate([
-            'nombre' => 'required|string|max:255|unique:categoria,nombre,' . $id . ',idCategoria',
-            'descripcion' => 'nullable|string'
-        ]);
+            $validator = Validator::make($request->all(), [
+                'nombre' => 'required|string|max:255|unique:categoria,nombre,' . $id . ',idCategoria',
+                'descripcion' => 'nullable|string'
+            ]);
 
-        $categoria->update($request->all());
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
 
-        return response()->json([
-            'message' => 'Categoría actualizada correctamente',
-            'categoria' => $categoria
-        ]);
+            $categoria->update($request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categoría actualizada correctamente',
+                'data' => $categoria
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Categoría no encontrada'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al actualizar la categoría',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroyCategoria($id)
     {
-        $categoria = Categoria::findOrFail($id);
-        
-        if ($categoria->productos()->exists()) {
+        try {
+            $categoria = Categoria::findOrFail($id);
+            
+            if ($categoria->productos()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se puede eliminar la categoría porque tiene productos asociados'
+                ], 422);
+            }
+
+            $categoria->delete();
+
             return response()->json([
-                'message' => 'No se puede eliminar la categoría porque tiene productos asociados'
-            ], 422);
+                'success' => true,
+                'message' => 'Categoría eliminada correctamente'
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Categoría no encontrada'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al eliminar la categoría',
+                'details' => $e->getMessage()
+            ], 500);
         }
-
-        $categoria->delete();
-
-        return response()->json([
-            'message' => 'Categoría eliminada correctamente'
-        ]);
     }
 
     // Movimientos de Inventario

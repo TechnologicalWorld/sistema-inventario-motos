@@ -9,23 +9,46 @@ use App\Models\Cliente;
 use App\Models\Producto;
 use App\Models\Persona;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class VentaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $ventas = Venta::with(['cliente.persona', 'detalleVentas.producto'])
-            ->where('idEmpleado', auth()->id())
-            ->orderBy('fecha', 'desc')
-            ->paginate(10);
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
 
-        return response()->json($ventas);
+            $ventas = Venta::with(['cliente.persona', 'detalleVentas.producto'])
+                ->where('idEmpleado', $user->idUsuario)
+                ->orderBy('fecha', 'desc')
+                ->paginate(10);
+
+            return response()->json([
+                'success' => true,
+                'data' => $ventas
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener las ventas',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'idCliente' => 'required|exists:cliente,idCliente',
             'metodoPago' => 'required|in:efectivo,tarjeta,transferencia',
             'descripcion' => 'nullable|string',
@@ -34,9 +57,25 @@ class VentaController extends Controller
             'detalles.*.cantidad' => 'required|integer|min:1'
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         DB::beginTransaction();
 
         try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
+
             // Verificar stock disponible
             foreach ($request->detalles as $detalle) {
                 $producto = Producto::find($detalle['idProducto']);
@@ -47,11 +86,11 @@ class VentaController extends Controller
 
             $venta = Venta::create([
                 'fecha' => now(),
-                'montoTotal' => 0, // Se calculará después
+                'montoTotal' => 0,
                 'metodoPago' => $request->metodoPago,
                 'descripcion' => $request->descripcion,
                 'idCliente' => $request->idCliente,
-                'idEmpleado' => auth()->id()
+                'idEmpleado' => $user->idUsuario
             ]);
 
             $totalVenta = 0;
@@ -70,38 +109,65 @@ class VentaController extends Controller
                     'idProducto' => $detalle['idProducto']
                 ]);
 
-                // Actualizar stock
                 $producto->stock -= $detalle['cantidad'];
                 $producto->save();
 
                 $totalVenta += $subTotal;
             }
 
-            // Actualizar total de la venta
             $venta->montoTotal = $totalVenta;
             $venta->save();
 
             DB::commit();
 
             return response()->json([
+                'success' => true,
                 'message' => 'Venta registrada correctamente',
-                'venta' => $venta->load(['cliente.persona', 'detalleVentas.producto'])
+                'data' => $venta->load(['cliente.persona', 'detalleVentas.producto'])
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'error' => 'Error al registrar venta: ' . $e->getMessage()
+                'success' => false,
+                'error' => 'Error al registrar venta',
+                'details' => $e->getMessage()
             ], 500);
         }
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $venta = Venta::with(['cliente.persona', 'detalleVentas.producto'])
-            ->where('idEmpleado', auth()->id())
-            ->findOrFail($id);
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
 
-        return response()->json($venta);
+            $venta = Venta::with(['cliente.persona', 'detalleVentas.producto'])
+                ->where('idEmpleado', $user->idUsuario)
+                ->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $venta
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Venta no encontrada'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener la venta',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 }

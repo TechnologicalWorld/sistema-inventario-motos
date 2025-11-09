@@ -6,37 +6,77 @@ use App\Http\Controllers\Controller;
 use App\Models\MovimientoInventario;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 class MovimientoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $movimientos = MovimientoInventario::with('producto')
-            ->where('idEmpleado', auth()->id())
-            ->orderBy('fechaMovimiento', 'desc')
-            ->paginate(10);
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
 
-        return response()->json($movimientos);
+            $movimientos = MovimientoInventario::with('producto')
+                ->where('idEmpleado', $user->idUsuario)
+                ->orderBy('fechaMovimiento', 'desc')
+                ->paginate(10);
+
+            return response()->json([
+                'success' => true,
+                'data' => $movimientos
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener los movimientos',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'tipo' => 'required|in:entrada,salida',
             'cantidad' => 'required|integer|min:1',
             'observacion' => 'required|string|max:500',
             'idProducto' => 'required|exists:producto,idProducto'
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         DB::beginTransaction();
 
         try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
+
             $producto = Producto::find($request->idProducto);
 
-            // Validar stock para salidas
             if ($request->tipo === 'salida' && $producto->stock < $request->cantidad) {
-                throw new \Exception('Stock insuficiente para realizar la salida');
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Stock insuficiente para realizar la salida'
+                ], 422);
             }
 
             $movimiento = MovimientoInventario::create([
@@ -45,10 +85,9 @@ class MovimientoController extends Controller
                 'observacion' => $request->observacion,
                 'fechaMovimiento' => now(),
                 'idProducto' => $request->idProducto,
-                'idEmpleado' => auth()->id()
+                'idEmpleado' => $user->idUsuario
             ]);
 
-            // Actualizar stock
             if ($request->tipo === 'entrada') {
                 $producto->stock += $request->cantidad;
             } else {
@@ -59,14 +98,17 @@ class MovimientoController extends Controller
             DB::commit();
 
             return response()->json([
+                'success' => true,
                 'message' => 'Movimiento registrado correctamente',
-                'movimiento' => $movimiento->load('producto')
+                'data' => $movimiento->load('producto')
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'error' => 'Error al registrar movimiento: ' . $e->getMessage()
+                'success' => false,
+                'error' => 'Error al registrar movimiento',
+                'details' => $e->getMessage()
             ], 500);
         }
     }

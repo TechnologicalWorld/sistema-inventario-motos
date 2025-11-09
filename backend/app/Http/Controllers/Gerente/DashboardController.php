@@ -1,46 +1,74 @@
 <?php
 
-namespace App\Http\Controllers\Gerente;
+namespace App\Http\Controllers\Empleado;
 
 use App\Http\Controllers\Controller;
 use App\Models\Venta;
 use App\Models\Producto;
 use App\Models\MovimientoInventario;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Resumen de ventas del día
-        $ventasHoy = Venta::whereDate('fecha', today())->get();
-        
-        // Stock crítico
-        $stockCritico = Producto::with('categoria')
-            ->stockBajo()
-            ->orderBy('stock')
-            ->limit(10)
-            ->get();
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
 
-        // Movimientos recientes
-        $movimientosRecientes = MovimientoInventario::with(['empleado.persona', 'producto'])
-            ->latest()
-            ->limit(10)
-            ->get();
+            $empleadoId = $user->idUsuario;
 
-        $estadisticas = [
-            'ventas_hoy' => $ventasHoy->count(),
-            'monto_ventas_hoy' => $ventasHoy->sum('montoTotal'),
-            'stock_critico' => $stockCritico->count(),
-            'movimientos_hoy' => MovimientoInventario::whereDate('fechaMovimiento', today())->count()
-        ];
+            // Últimas ventas del empleado
+            $ultimasVentas = Venta::with(['cliente.persona', 'detalleVentas'])
+                ->where('idEmpleado', $empleadoId)
+                ->latest()
+                ->limit(5)
+                ->get();
 
-        return response()->json([
-            'estadisticas' => $estadisticas,
-            'stock_critico' => $stockCritico,
-            'movimientos_recientes' => $movimientosRecientes,
-            'ventas_hoy' => $ventasHoy
-        ]);
+            // Productos con stock bajo
+            $stockBajo = Producto::with('categoria')
+                ->stockBajo()
+                ->orderBy('stock')
+                ->limit(5)
+                ->get();
+
+            // Últimos movimientos del empleado
+            $ultimosMovimientos = MovimientoInventario::with('producto')
+                ->where('idEmpleado', $empleadoId)
+                ->latest()
+                ->limit(5)
+                ->get();
+
+            $estadisticas = [
+                'ventas_hoy' => Venta::where('idEmpleado', $empleadoId)
+                    ->whereDate('fecha', today())->count(),
+                'movimientos_hoy' => MovimientoInventario::where('idEmpleado', $empleadoId)
+                    ->whereDate('fechaMovimiento', today())->count(),
+                'productos_stock_bajo' => $stockBajo->count()
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'estadisticas' => $estadisticas,
+                    'ultimas_ventas' => $ultimasVentas,
+                    'stock_bajo' => $stockBajo,
+                    'ultimos_movimientos' => $ultimosMovimientos
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al cargar el dashboard',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 }

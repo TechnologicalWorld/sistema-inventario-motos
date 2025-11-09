@@ -14,37 +14,115 @@ class CatalogoController extends Controller
 {
     public function categorias()
     {
-        $categorias = Categoria::all();
-        return response()->json($categorias);
+        try {
+            $categorias = Categoria::all();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $categorias
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener categorías',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function proveedores()
     {
-        $proveedores = EmpresaProveedora::all();
-        return response()->json($proveedores);
+        try {
+            $proveedores = EmpresaProveedora::all();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $proveedores
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener proveedores',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function departamentos()
     {
-        $departamentos = Departamento::all();
-        return response()->json($departamentos);
+        try {
+            $departamentos = Departamento::all();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $departamentos
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener departamentos',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function productos()
     {
-        $productos = Producto::with('categoria')->activos()->get();
-        return response()->json($productos);
+        try {
+            $productos = Producto::with('categoria')->activos()->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $productos
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener productos',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function clientes()
     {
-        $clientes = Cliente::with('persona')->get();
-        return response()->json($clientes);
+        try {
+            $clientes = Cliente::with('persona')->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $clientes
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener clientes',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function empleados()
     {
-        $empleados = Empleado::with('persona')->get();
-        return response()->json($empleados);
+        try {
+            $empleados = Empleado::with('persona')->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $empleados
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener empleados',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 }

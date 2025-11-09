@@ -8,30 +8,44 @@ use App\Models\DetalleCompra;
 use App\Models\EmpresaProveedora;
 use App\Models\Producto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CompraController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Compra::with(['empresaProveedora', 'gerente.persona', 'detalleCompras.producto']);
+        try {
+            $query = Compra::with(['empresaProveedora', 'gerente.persona', 'detalleCompras.producto']);
 
-        if ($request->has('proveedor')) {
-            $query->porProveedor($request->proveedor);
+            if ($request->has('proveedor')) {
+                $query->porProveedor($request->proveedor);
+            }
+
+            if ($request->has('fecha_inicio') && $request->has('fecha_fin')) {
+                $query->porFecha($request->fecha_inicio, $request->fecha_fin);
+            }
+
+            $compras = $query->orderBy('fecha', 'desc')->paginate(15);
+
+            return response()->json([
+                'success' => true,
+                'data' => $compras
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener las compras',
+                'details' => $e->getMessage()
+            ], 500);
         }
-
-        if ($request->has('fecha_inicio') && $request->has('fecha_fin')) {
-            $query->porFecha($request->fecha_inicio, $request->fecha_fin);
-        }
-
-        $compras = $query->orderBy('fecha', 'desc')->paginate(15);
-
-        return response()->json($compras);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'idEmpresaP' => 'required|exists:empresa_proveedora,idEmpresaP',
             'observacion' => 'nullable|string',
             'detalles' => 'required|array|min:1',
@@ -40,15 +54,31 @@ class CompraController extends Controller
             'detalles.*.precioUnitario' => 'required|numeric|min:0'
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         DB::beginTransaction();
 
         try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
+
             $compra = Compra::create([
                 'fecha' => now(),
-                'totalPago' => 0, // Se calculará después
+                'totalPago' => 0,
                 'observacion' => $request->observacion,
                 'idEmpresaP' => $request->idEmpresaP,
-                'idGerente' => auth()->id()
+                'idGerente' => $user->idUsuario
             ]);
 
             $totalCompra = 0;
@@ -64,7 +94,6 @@ class CompraController extends Controller
                     'idProducto' => $detalle['idProducto']
                 ]);
 
-                // Actualizar stock del producto
                 $producto = Producto::find($detalle['idProducto']);
                 $producto->stock += $detalle['cantidad'];
                 $producto->save();
@@ -72,30 +101,49 @@ class CompraController extends Controller
                 $totalCompra += $subTotal;
             }
 
-            // Actualizar total de la compra
             $compra->totalPago = $totalCompra;
             $compra->save();
 
             DB::commit();
 
             return response()->json([
+                'success' => true,
                 'message' => 'Compra registrada correctamente',
-                'compra' => $compra->load(['empresaProveedora', 'detalleCompras.producto'])
+                'data' => $compra->load(['empresaProveedora', 'detalleCompras.producto'])
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                'error' => 'Error al registrar compra: ' . $e->getMessage()
+                'success' => false,
+                'error' => 'Error al registrar compra',
+                'details' => $e->getMessage()
             ], 500);
         }
     }
 
     public function show($id)
     {
-        $compra = Compra::with(['empresaProveedora', 'gerente.persona', 'detalleCompras.producto'])
-            ->findOrFail($id);
+        try {
+            $compra = Compra::with(['empresaProveedora', 'gerente.persona', 'detalleCompras.producto'])
+                ->findOrFail($id);
 
-        return response()->json($compra);
+            return response()->json([
+                'success' => true,
+                'data' => $compra
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Compra no encontrada'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener la compra',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 }
