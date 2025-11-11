@@ -34,6 +34,9 @@ class CheckRole
             return 'empleado';
         }
 
+        if ($user instanceof \App\Models\Propietario) {
+            return 'propietario';
+        }
         return null;
     }
 }

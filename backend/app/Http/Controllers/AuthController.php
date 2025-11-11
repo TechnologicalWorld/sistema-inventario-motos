@@ -19,7 +19,7 @@ class AuthController extends Controller
     {
         $validatorPersona = Validator::make($request->all(), [
             'role' => 'required|in:gerente,empleado,propietario',
-            'ci' => 'required|string|unique:personas,ci',
+            'ci' => 'required|string|unique:persona,ci',
             'paterno' => 'required|string|max:255',
             'materno' => 'required|string|max:255',
             'nombres' => 'required|string|max:255',
@@ -37,7 +37,7 @@ class AuthController extends Controller
                 'email' => 'required|email|unique:gerente,email|unique:empleado,email',
                 'password' => 'required|string',
                 'direccion' => 'required|string|max:255',
-                'fechaContratacion' => 'required|date',
+                'fecha_contratacion' => 'required|date',
             ]);
             if ($validatorTrabajador->fails()) {
                 return response()->json(['errors' => $validatorTrabajador->errors()], 422);
@@ -66,7 +66,7 @@ class AuthController extends Controller
                     try {
                         $user = Gerente::create([
                             'idGerente' => $persona->idPersona,
-                            'fechaContratacion' => $request->fechaContratacion,
+                            'fecha_contratacion' => $request->fecha_contratacion,
                             'email' => $request->email,
                             'direccion' => $request->direccion,
                             'password' => $request->password,
@@ -81,7 +81,7 @@ class AuthController extends Controller
                     try {
                         $user = Empleado::create([
                             'idEmpleado' => $persona->idPersona,
-                            'fechaContratacion' => $request->fechaContratacion,
+                            'fecha_contratacion' => $request->fecha_contratacion,
                             'email' => $request->email,
                             'direccion' => $request->direccion,
                             'password' => $request->password,
@@ -96,6 +96,8 @@ class AuthController extends Controller
                     try {
                         Propietario::create([
                             'idPropietario' => $persona->idPersona,
+                            'email' => $request->email,
+                            'password' => $request->password
                         ]);
                     } catch (\Throwable $th) {
                         echo $th;
@@ -118,7 +120,7 @@ class AuthController extends Controller
                 return response()->json([
                     'message' => 'Usuario registrado exitosamente',
                     'token' => $token,
-                    $this->getUserData($user, $request->role),
+                    'usuario' => $this->getUserData($user, $request->role),
                     'role' => $request->role
                 ], 201);
             }
@@ -167,6 +169,18 @@ class AuthController extends Controller
             ]);
         }
 
+        $propietario = Propietario::where('email', $request->email)->first();
+        if ($propietario && Hash::check($request->password, $propietario->password)) {
+            $token = $propietario->createToken('propietario-token')->plainTextToken;
+            return response()->json([
+                'token' => $token,
+                'user' => [
+                    'persona' => $propietario->persona,
+                    'role' => 'propietario'
+                ]
+            ]);
+        }
+
         throw ValidationException::withMessages([
             'email' => ['Las credenciales son incorrectas.'],
         ]);
@@ -194,6 +208,15 @@ class AuthController extends Controller
             return response()->json([
                 'user' => $this->getUserData($user, 'empleado'),
                 'role' => 'empleado'
+            ]);
+        }
+
+        if ($user instanceof Propietario) {
+            return response()->json([
+                'user' => [
+                    'persona' => $user->persona,
+                    'role' => 'propietario'
+                ]
             ]);
         }
 
