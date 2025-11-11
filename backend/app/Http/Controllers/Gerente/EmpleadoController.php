@@ -126,9 +126,10 @@ class EmpleadoController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $empleado = Empleado::with('persona')->findOrFail($id);
+            $empleado = Empleado::with(['persona', 'user'])->findOrFail($id);
 
             $validator = Validator::make($request->all(), [
+                'ci' => 'required|string|unique:persona,ci,' . $empleado->persona->idPersona . ',idPersona',
                 'paterno' => 'required|string|max:255',
                 'materno' => 'required|string|max:255',
                 'nombres' => 'required|string|max:255',
@@ -138,6 +139,7 @@ class EmpleadoController extends Controller
                 'email' => 'required|email|unique:empleado,email,' . $id . ',idEmpleado',
                 'direccion' => 'required|string',
                 'fecha_contratacion' => 'required|date',
+                'password' => 'nullable|string|min:6',
                 'departamentos' => 'nullable|array',
                 'departamentos.*' => 'exists:departamento,idDepartamento'
             ]);
@@ -152,21 +154,45 @@ class EmpleadoController extends Controller
             DB::beginTransaction();
 
             $empleado->persona->update($request->only([
-                'paterno', 'materno', 'nombres', 'fecha_naci', 'genero', 'telefono'
+                'ci', 'paterno', 'materno', 'nombres', 'fecha_naci', 'genero', 'telefono'
             ]));
 
-            $empleado->update($request->only([
+            $empleadoData = $request->only([
                 'email', 'direccion', 'fecha_contratacion'
-            ]));
-
-            $empleado->user->update([
-                'email' => $request->email,
-                'direccion' => $request->direccion,
-                'fecha_contratacion' => $request->fecha_contratacion
             ]);
 
+            if ($request->password) {
+                $empleadoData['password'] = Hash::make($request->password);
+            }
+
+            $empleado->update($empleadoData);
+
+            // Verificar si existe el user antes de actualizar
+            if ($empleado->user) {
+                $userData = [
+                    'email' => $request->email,
+                    'direccion' => $request->direccion,
+                    'fecha_contratacion' => $request->fecha_contratacion
+                ];
+
+                if ($request->password) {
+                    $userData['password'] = Hash::make($request->password);
+                }
+
+                $empleado->user->update($userData);
+            }
+
             if ($request->has('departamentos')) {
-                $empleado->departamentos()->sync($request->departamentos);
+                Trabaja::where('idEmpleado', $empleado->idEmpleado)->delete();
+                
+                foreach ($request->departamentos as $departamentoId) {
+                    Trabaja::create([
+                        'idEmpleado' => $empleado->idEmpleado,
+                        'idDepartamento' => $departamentoId,
+                        'fecha' => now(),
+                        'observacion' => 'Actualización de departamentos'
+                    ]);
+                }
             }
 
             DB::commit();
@@ -239,7 +265,8 @@ class EmpleadoController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'departamentos' => 'required|array',
-                'departamentos.*' => 'exists:departamento,idDepartamento'
+                'departamentos.*' => 'exists:departamento,idDepartamento',
+                'observacion' => 'nullable|string|max:255'
             ]);
 
             if ($validator->fails()) {
@@ -249,7 +276,22 @@ class EmpleadoController extends Controller
                 ], 422);
             }
 
-            $empleado->departamentos()->sync($request->departamentos);
+            DB::beginTransaction();
+
+            // Eliminar asignaciones existentes
+            Trabaja::where('idEmpleado', $empleado->idEmpleado)->delete();
+            
+            // Crear nuevas asignaciones con fecha y observación
+            foreach ($request->departamentos as $departamentoId) {
+                Trabaja::create([
+                    'idEmpleado' => $empleado->idEmpleado,
+                    'idDepartamento' => $departamentoId,
+                    'fecha' => now()->toDateString(),
+                    'observacion' => $request->observacion ?? 'Asignación de departamentos'
+                ]);
+            }
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -263,6 +305,7 @@ class EmpleadoController extends Controller
                 'error' => 'Empleado no encontrado'
             ], 404);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'error' => 'Error al asignar departamentos',

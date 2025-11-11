@@ -7,6 +7,7 @@ use App\Models\Compra;
 use App\Models\DetalleCompra;
 use App\Models\EmpresaProveedora;
 use App\Models\Producto;
+use App\Models\Gerente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -73,12 +74,34 @@ class CompraController extends Controller
                 ], 401);
             }
 
+            // Obtener el gerente autenticado - DIFERENTES OPCIONES
+            $gerente = Gerente::where('email', $user->email)->first();
+            
+            // Si no funciona por email, intentar por idUsuario
+            if (!$gerente) {
+                $gerente = Gerente::find($user->idUsuario);
+            }
+            
+            // Si aún no encontramos el gerente, buscar por relación con persona
+            if (!$gerente) {
+                $gerente = Gerente::whereHas('persona', function($query) use ($user) {
+                    $query->where('idPersona', $user->idUsuario);
+                })->first();
+            }
+
+            if (!$gerente) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no es un gerente válido. ID Usuario: ' . $user->idUsuario
+                ], 403);
+            }
+
             $compra = Compra::create([
                 'fecha' => now(),
                 'totalPago' => 0,
                 'observacion' => $request->observacion,
                 'idEmpresaP' => $request->idEmpresaP,
-                'idGerente' => $user->idUsuario
+                'idGerente' => $gerente->idGerente
             ]);
 
             $totalCompra = 0;
@@ -94,9 +117,12 @@ class CompraController extends Controller
                     'idProducto' => $detalle['idProducto']
                 ]);
 
+                // Actualizar stock del producto
                 $producto = Producto::find($detalle['idProducto']);
-                $producto->stock += $detalle['cantidad'];
-                $producto->save();
+                if ($producto) {
+                    $producto->stock += $detalle['cantidad'];
+                    $producto->save();
+                }
 
                 $totalCompra += $subTotal;
             }
@@ -106,10 +132,17 @@ class CompraController extends Controller
 
             DB::commit();
 
+            // Cargar relaciones
+            $compra->load([
+                'empresaProveedora', 
+                'gerente.persona',
+                'detalleCompras.producto'
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Compra registrada correctamente',
-                'data' => $compra->load(['empresaProveedora', 'detalleCompras.producto'])
+                'data' => $compra
             ], 201);
 
         } catch (\Exception $e) {

@@ -40,14 +40,14 @@ class Producto extends Model
         return $this->hasMany(MovimientoInventario::class, 'idProducto');
     }
 
-    public function detallesCompras()
+    public function detalleCompras()
     {
         return $this->hasMany(DetalleCompra::class, 'idProducto');
     }
     
     public function detalleVentas()
     {
-        return $this->hasMany(DetalleVenta::class, 'idProducto', 'idProducto');
+        return $this->hasMany(DetalleVenta::class, 'idProducto');
     }
 
     public function getStockBajoAttribute()
