@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Departamento;
 use App\Models\Trabaja;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DepartamentoController extends Controller
 {
@@ -21,11 +22,13 @@ class DepartamentoController extends Controller
                 ], 401);
             }
 
-            $empleadoId = $user->idUsuario;
+            $empleadoId = $user->idEmpleado;
             
-            $departamento = Departamento::whereHas('empleados', function($query) use ($empleadoId) {
-                $query->where('idEmpleado', $empleadoId);
-            })->first();
+            $departamentosActuales = DB::table('trabaja')
+                ->join('departamento', 'trabaja.idDepartamento', '=', 'departamento.idDepartamento')
+                ->where('trabaja.idEmpleado', $empleadoId)
+                ->select('departamento.*', 'trabaja.fecha', 'trabaja.observacion')
+                ->get();
 
             $historialAsignaciones = Trabaja::with('departamento')
                 ->where('idEmpleado', $empleadoId)
@@ -35,7 +38,7 @@ class DepartamentoController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'departamento_actual' => $departamento,
+                    'departamentos_actuales' => $departamentosActuales,
                     'historial_asignaciones' => $historialAsignaciones
                 ]
             ], 200);

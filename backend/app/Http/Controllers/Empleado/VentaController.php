@@ -28,7 +28,7 @@ class VentaController extends Controller
             }
 
             $ventas = Venta::with(['cliente.persona', 'detalleVentas.producto'])
-                ->where('idEmpleado', $user->idUsuario)
+                ->where('idEmpleado', $user->idEmpleado)
                 ->orderBy('fecha', 'desc')
                 ->paginate(10);
 
@@ -75,12 +75,13 @@ class VentaController extends Controller
                     'error' => 'Usuario no autenticado'
                 ], 401);
             }
-
-            // Verificar stock disponible
             foreach ($request->detalles as $detalle) {
                 $producto = Producto::find($detalle['idProducto']);
+                if (!$producto) {
+                    throw new \Exception("Producto no encontrado");
+                }
                 if ($producto->stock < $detalle['cantidad']) {
-                    throw new \Exception("Stock insuficiente para el producto: {$producto->nombre}");
+                    throw new \Exception("Stock insuficiente para el producto: {$producto->nombre}. Stock disponible: {$producto->stock}");
                 }
             }
 
@@ -90,7 +91,7 @@ class VentaController extends Controller
                 'metodoPago' => $request->metodoPago,
                 'descripcion' => $request->descripcion,
                 'idCliente' => $request->idCliente,
-                'idEmpleado' => $user->idUsuario
+                'idEmpleado' => $user->idEmpleado // CORREGIDO: idUsuario -> idEmpleado
             ]);
 
             $totalVenta = 0;
@@ -149,7 +150,7 @@ class VentaController extends Controller
             }
 
             $venta = Venta::with(['cliente.persona', 'detalleVentas.producto'])
-                ->where('idEmpleado', $user->idUsuario)
+                ->where('idEmpleado', $user->idEmpleado) 
                 ->findOrFail($id);
 
             return response()->json([
