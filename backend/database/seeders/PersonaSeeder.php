@@ -60,7 +60,7 @@ class PersonaSeeder extends Seeder
                 'fecha_naci' => '1990-03-10',
                 'genero' => 'M',
                 'telefono' => '77711223',
-                'email' => 'juan.perez@motoshop.com',
+                'email' => 'empleado@motoshop.com',
                 'direccion' => 'Calle Secundaria #456',
             ],
             [
