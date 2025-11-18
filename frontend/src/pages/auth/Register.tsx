@@ -67,7 +67,7 @@ export const Register: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Brand Section */}
-      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-[#95051F] to-[#875260] relative overflow-hidden">
+      <div className="hidden lg:flex lg:flex-1 bg-linear-to-br from-[#95051F] to-[#875260] relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative z-10 flex flex-col justify-center px-12 text-white">
           <div className="mb-8">

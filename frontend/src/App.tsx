@@ -9,7 +9,7 @@ import { Register } from "./pages/auth/Register";
 import { Unauthorized } from "./pages/auth/Unauthorized";
 
 // Layout
-import DashboardLayout from "./components/layout/DashboardLayout";
+import DashboardLayout from "./components/layout/Layout";
 import { Perfil } from "./services/shared/Perfil";
 
 // Pages dentro del dashboard
