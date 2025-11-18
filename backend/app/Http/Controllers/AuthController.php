@@ -32,9 +32,9 @@ class AuthController extends Controller
             return response()->json(['errors' => $validatorPersona->errors()], 422);
         }
         // Validaciones específicas por rol
-        if (in_array($request->role, ['gerente', 'empleado'])) {
+        if (in_array($request->role, ['gerente', 'empleado', 'propietario'])) {
             $validatorTrabajador = Validator::make($request->all(), [
-                'email' => 'required|email|unique:gerente,email|unique:empleado,email',
+                'email' => 'required|email|unique:gerente,email|unique:empleado,email|unique:propietario,email',
                 'password' => 'required|string',
                 'direccion' => 'required|string|max:255',
                 'fecha_contratacion' => 'required|date',
@@ -59,6 +59,7 @@ class AuthController extends Controller
             ]);
 
             $persona->save();
+
 
             // 2. Crear el registro específico según el rol
             switch ($request->role) {
@@ -111,7 +112,7 @@ class AuthController extends Controller
 
             DB::commit();
             // Si es un usuario autenticable, generar token
-            if (in_array($request->role, ['gerente', 'empleado'])) {
+            if (in_array($request->role, ['gerente', 'empleado', 'propietario'])) {
                 try {
                     $token = $user->createToken($user->email)->plainTextToken;
                 } catch (\Throwable $th) {
@@ -126,12 +127,9 @@ class AuthController extends Controller
             }
 
             return response()->json([
-                'message' => 'Propietario registrado exitosamente',
-                'user' => [
-                    'persona' => $persona,
-                    'role' => 'propietario'
-                ]
-            ], 201);
+                'message' => 'Error',
+
+            ], 400);
         } catch (\Exception $e) {
             DB::rollBack();
             throw ValidationException::withMessages([
@@ -152,6 +150,7 @@ class AuthController extends Controller
         if ($gerente && Hash::check($request->password, $gerente->password)) {
             $token = $gerente->createToken('gerente-token')->plainTextToken;
             return response()->json([
+                'message' => 'Usuario logueado exitosamente',
                 'token' => $token,
                 'user' => $this->getUserData($gerente, 'gerente'),
                 'role' => 'gerente'
@@ -163,6 +162,7 @@ class AuthController extends Controller
         if ($empleado && Hash::check($request->password, $empleado->password)) {
             $token = $empleado->createToken('empleado-token')->plainTextToken;
             return response()->json([
+                'message' => 'Usuario logueado exitosamente',
                 'token' => $token,
                 'user' => $this->getUserData($empleado, 'empleado'),
                 'role' => 'empleado'
@@ -173,11 +173,10 @@ class AuthController extends Controller
         if ($propietario && Hash::check($request->password, $propietario->password)) {
             $token = $propietario->createToken('propietario-token')->plainTextToken;
             return response()->json([
+                'message' => 'Usuario logueado exitosamente',
                 'token' => $token,
-                'user' => [
-                    'persona' => $propietario->persona,
-                    'role' => 'propietario'
-                ]
+                'user' => $this->getUserData($propietario, 'propietario'),
+                'role' => 'propietario'
             ]);
         }
 
@@ -213,10 +212,8 @@ class AuthController extends Controller
 
         if ($user instanceof Propietario) {
             return response()->json([
-                'user' => [
-                    'persona' => $user->persona,
-                    'role' => 'propietario'
-                ]
+                'user' => $this->getUserData($user, 'propietario'),
+                'role' => 'propietario'
             ]);
         }
 

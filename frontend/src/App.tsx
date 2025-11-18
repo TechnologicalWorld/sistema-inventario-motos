@@ -1,35 +1,75 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.tsx
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./hooks/useAuth";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+
+// Pages de Auth
+import { Login } from "./pages/auth/Login";
+import { Register } from "./pages/auth/Register";
+import { Unauthorized } from "./pages/auth/Unauthorized";
+
+// Layout
+import DashboardLayout from "./components/layout/DashboardLayout";
+import { Perfil } from "./services/shared/Perfil";
+
+// Pages dentro del dashboard
+// Importa otras páginas que necesites...
+// import { Dashboard } from "./pages/dashboard/Dashboard";
+// import { Productos } from "./pages/inventario/Productos";
+
+// Componente para redirigir al dashboard según el rol
+const NavigateToDashboard = () => {
+  const { user } = useAuth();
+  
+  if (!user) return <Navigate to="/login" replace />;
+  
+  switch (user.role) {
+    case 'gerente':
+      return <Navigate to="/gerente/dashboard" replace />;
+    case 'empleado':
+      return <Navigate to="/empleado/dashboard" replace />;
+    case 'propietario':
+      return <Navigate to="/propietario/dashboard" replace />;
+    default:
+      return <Navigate to="/login" replace />;
+  }
+};
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      {/* Rutas públicas */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+      
+      {/* Ruta raíz - redirige al dashboard según el rol */}
+      <Route path="/" element={<NavigateToDashboard />} />
+      
+      {/* ============================================================================ */}
+      {/* RUTAS PROTEGIDAS CON DASHBOARD LAYOUT */}
+      {/* ============================================================================ */}
+      <Route path="/*" element={
+        <ProtectedRoute>
+          <DashboardLayout />
+        </ProtectedRoute>
+      }>
+        {/* Rutas específicas dentro del dashboard layout */}
+        <Route path="perfil" element={<Perfil />} />
+        
+        {/* Aquí puedes agregar más rutas que usen el mismo layout */}
+        {/* <Route path="dashboard" element={<Dashboard />} /> */}
+        {/* <Route path="productos" element={<Productos />} /> */}
+        {/* <Route path="clientes" element={<Clientes />} /> */}
+        
+        {/* Ruta por defecto dentro del layout */}
+        <Route path="" element={<NavigateToDashboard />} />
+      </Route>
+      
+      {/* Ruta 404 */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
