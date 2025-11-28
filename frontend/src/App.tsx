@@ -12,23 +12,53 @@ import { Unauthorized } from "./pages/auth/Unauthorized";
 import DashboardLayout from "./components/layout/Layout";
 import { Perfil } from "./services/shared/Perfil";
 
-// Pages dentro del dashboard
-// Importa otras páginas que necesites...
-// import { Dashboard } from "./pages/dashboard/Dashboard";
-// import { Productos } from "./pages/inventario/Productos";
+// ========================
+// GERENTE - Inventarios
+// ========================
+import ProductosPage from "./pages/gerente/inventario/productos/pages/ProductosPage";
+import CategoriasPage from "./pages/gerente/inventario/categorias/pages/CategoriasPage";
+import MovimientosPage from "./pages/gerente/inventario/movimientos/pages/MovimientosPage";
+
+/**
+ * Dashboards temporales por rol
+ * (Puedes reemplazarlos por tus propios componentes reales)
+ */
+const GerenteDashboard = () => (
+  <div className="p-4">
+    <h1 className="text-xl font-semibold">
+      Dashboard GERENTE (reemplazar por tu componente real)
+    </h1>
+  </div>
+);
+
+const EmpleadoDashboard = () => (
+  <div className="p-4">
+    <h1 className="text-xl font-semibold">
+      Dashboard EMPLEADO (reemplazar por tu componente real)
+    </h1>
+  </div>
+);
+
+const PropietarioDashboard = () => (
+  <div className="p-4">
+    <h1 className="text-xl font-semibold">
+      Dashboard PROPIETARIO (reemplazar por tu componente real)
+    </h1>
+  </div>
+);
 
 // Componente para redirigir al dashboard según el rol
 const NavigateToDashboard = () => {
   const { user } = useAuth();
-  
+
   if (!user) return <Navigate to="/login" replace />;
-  
+
   switch (user.role) {
-    case 'gerente':
+    case "gerente":
       return <Navigate to="/gerente/dashboard" replace />;
-    case 'empleado':
+    case "empleado":
       return <Navigate to="/empleado/dashboard" replace />;
-    case 'propietario':
+    case "propietario":
       return <Navigate to="/propietario/dashboard" replace />;
     default:
       return <Navigate to="/login" replace />;
@@ -38,35 +68,96 @@ const NavigateToDashboard = () => {
 function App() {
   return (
     <Routes>
-      {/* Rutas públicas */}
+      {/* ================================================== */}
+      {/* RUTAS PÚBLICAS (LOGIN / REGISTER / UNAUTHORIZED)   */}
+      {/* ================================================== */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      
+
       {/* Ruta raíz - redirige al dashboard según el rol */}
       <Route path="/" element={<NavigateToDashboard />} />
-      
+
       {/* ============================================================================ */}
-      {/* RUTAS PROTEGIDAS CON DASHBOARD LAYOUT */}
+      {/* RUTAS PROTEGIDAS envueltas en DashboardLayout                               */}
+      {/* Todo lo que va dentro de path="/*" usa el mismo layout + ProtectedRoute     */}
       {/* ============================================================================ */}
-      <Route path="/*" element={
-        <ProtectedRoute>
-          <DashboardLayout />
-        </ProtectedRoute>
-      }>
-        {/* Rutas específicas dentro del dashboard layout */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
+        {/* =============================================== */}
+        {/* RUTAS COMUNES A TODOS LOS ROLES (DENTRO LAYOUT) */}
+        {/* =============================================== */}
         <Route path="perfil" element={<Perfil />} />
-        
-        {/* Aquí puedes agregar más rutas que usen el mismo layout */}
-        {/* <Route path="dashboard" element={<Dashboard />} /> */}
-        {/* <Route path="productos" element={<Productos />} /> */}
-        {/* <Route path="clientes" element={<Clientes />} /> */}
-        
-        {/* Ruta por defecto dentro del layout */}
+
+        {/* ============================== */}
+        {/* RUTAS PARA ROL: GERENTE        */}
+        {/* Prefix: /gerente/...           */}
+        {/* ============================== */}
+        <Route
+          path="gerente/dashboard"
+          element={<GerenteDashboard />}
+        />
+
+        {/* Inventarios - Gerente */}
+        <Route
+          path="gerente/inventarios/productos"
+          element={<ProductosPage />}
+        />
+        <Route
+          path="gerente/inventarios/categorias"
+          element={<CategoriasPage />}
+        />
+        <Route
+          path="gerente/inventarios/movimientos"
+          element={<MovimientosPage />}
+        />
+
+        {/* Aquí luego puedes añadir más rutas del gerente, ej:
+            <Route path="gerente/reportes" element={<ReportesGerente />} />
+        */}
+
+        {/* ============================== */}
+        {/* RUTAS PARA ROL: EMPLEADO       */}
+        {/* Prefix: /empleado/...          */}
+        {/* ============================== */}
+        <Route
+          path="empleado/dashboard"
+          element={<EmpleadoDashboard />}
+        />
+        {/* Ejemplos futuros:
+            <Route path="empleado/ventas" element={<VentasEmpleado />} />
+            <Route path="empleado/clientes" element={<ClientesEmpleado />} />
+        */}
+
+        {/* ============================== */}
+        {/* RUTAS PARA ROL: PROPIETARIO    */}
+        {/* Prefix: /propietario/...       */}
+        {/* ============================== */}
+        <Route
+          path="propietario/dashboard"
+          element={<PropietarioDashboard />}
+        />
+        {/* Ejemplos futuros:
+            <Route path="propietario/reportes" element={<ReportesPropietario />} />
+        */}
+
+        {/* ===================================================== */}
+        {/* Ruta por defecto dentro del layout protegido          */}
+        {/* Si entras a /gerente, /empleado, etc sin path final,  */}
+        {/* vuelve a decidir según el rol actual                  */}
+        {/* ===================================================== */}
         <Route path="" element={<NavigateToDashboard />} />
       </Route>
-      
-      {/* Ruta 404 */}
+
+      {/* ========================================= */}
+      {/* RUTA 404 GLOBAL (TODO LO DEMÁS REDIRIGE)  */}
+      {/* ========================================= */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
