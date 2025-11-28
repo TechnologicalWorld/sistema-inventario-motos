@@ -1,4 +1,3 @@
-// src/pages/gerente/inventario/movimientos/movimientos.service.ts
 import api from "../../../../services/api";
 import type { Producto } from "../productos/productos.service";
 

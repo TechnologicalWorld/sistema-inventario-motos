@@ -1,4 +1,3 @@
-// src/pages/gerente/inventario/movimientos/pages/MovimientosPage.tsx
 import { useEffect, useState } from "react";
 import {
   FiFilter,
@@ -63,7 +62,6 @@ export default function MovimientosPage() {
   );
 
   const loadProductos = async () => {
-    // para el combo de productos usamos primera página con muchos elementos
     const res = await productosService.getProductos({
       page: 1,
     });
@@ -162,8 +160,7 @@ export default function MovimientosPage() {
     setErrorMsg(null);
 
     try {
-      // idEmpleado lo obtendrías del usuario logeado, por ahora lo dejo fijo (deberías adaptar)
-      const idEmpleado = 13; // TODO: reemplazar por user.idEmpleado cuando lo tengas en el contexto
+      const idEmpleado = 13; 
 
       await movimientosService.createMovimiento({
         tipo: form.tipo,
@@ -211,15 +208,11 @@ export default function MovimientosPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-400 bg-gray-100 hover:bg-gray-200 transition">
-            <FiFilter />
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-400 bg-gray-100 hover:bg-gray-200 transition">
-            <FiTag />
-          </button>
+          
           <button
             onClick={handleRefresh}
             className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-400 bg-gray-100 hover:bg-gray-200 transition"
+            title="Actualizar lista"
           >
             <FiRefreshCcw />
           </button>
@@ -443,8 +436,6 @@ export default function MovimientosPage() {
           <FiChevronRight />
         </button>
       </div>
-
-      
 
       {/* Modal detalle */}
       {modalMode === "detail" && selected && (

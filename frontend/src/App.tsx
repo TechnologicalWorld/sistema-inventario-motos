@@ -26,7 +26,7 @@ import MovimientosPage from "./pages/gerente/inventario/movimientos/pages/Movimi
 const GerenteDashboard = () => (
   <div className="p-4">
     <h1 className="text-xl font-semibold">
-      Dashboard GERENTE (reemplazar por tu componente real)
+      Dashboard GERENTE
     </h1>
   </div>
 );
