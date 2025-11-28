@@ -11,3 +11,12 @@
   --color-neutral-100: #E7E1E0;
 }
 
+/* Ocultar scrollbars pero permitir scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE y Edge */
+  scrollbar-width: none;    /* Firefox */
+}
