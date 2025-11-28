@@ -20,6 +20,7 @@ import {
 
 import { useAuth } from "../../hooks/useAuth";
 import type { UserRole } from "../../types/auth";
+import marcaRuedas from "../../assets/marca_ruedas.png";
 
 // -------------------- Tipos --------------------
 
@@ -578,13 +579,27 @@ export default function Sidebar({ collapsed }: SidebarProps) {
   return (
     <aside
       className={`
-        h-full bg-gradient-to-b from-[#95051F] to-[#875260]
+        h-full bg-gradient-to-b from-[#CE0621] to-[#5E0017]
         text-white flex flex-col shadow-2xl
         transition-all duration-300
         ${collapsed ? "w-16" : "w-64"}
       `}
     >
-      {collapsed ? renderCollapsed() : renderExpanded()}
+      {/* Fondo con marca de ruedas */}
+      <div
+        className="pointer-events-none absolute bottom-25 left-0 w-full h-60 opacity-80"
+        style={{
+          backgroundImage: `url(${marcaRuedas})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+
+      {/* Contenido del sidebar por encima de la imagen */}
+      <div className="relative z-10 flex flex-col h-full">
+        {collapsed ? renderCollapsed() : renderExpanded()}
+      </div>
     </aside>
   );
 }
