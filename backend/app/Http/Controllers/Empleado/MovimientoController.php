@@ -24,7 +24,7 @@ class MovimientoController extends Controller
             }
 
             $movimientos = MovimientoInventario::with('producto')
-                ->where('idEmpleado', $user->idUsuario)
+                ->where('idEmpleado', $user->idEmpleado)
                 ->orderBy('fechaMovimiento', 'desc')
                 ->paginate(10);
 
@@ -85,7 +85,7 @@ class MovimientoController extends Controller
                 'observacion' => $request->observacion,
                 'fechaMovimiento' => now(),
                 'idProducto' => $request->idProducto,
-                'idEmpleado' => $user->idUsuario
+                'idEmpleado' => $user->idEmpleado
             ]);
 
             if ($request->tipo === 'entrada') {

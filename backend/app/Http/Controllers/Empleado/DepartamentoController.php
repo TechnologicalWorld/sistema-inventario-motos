@@ -8,6 +8,8 @@ use App\Models\Trabaja;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
+
 class DepartamentoController extends Controller
 {
     public function miDepartamento(Request $request)
@@ -24,11 +26,16 @@ class DepartamentoController extends Controller
 
             $empleadoId = $user->idEmpleado;
             
-            $departamentosActuales = DB::table('trabaja')
-                ->join('departamento', 'trabaja.idDepartamento', '=', 'departamento.idDepartamento')
-                ->where('trabaja.idEmpleado', $empleadoId)
-                ->select('departamento.*', 'trabaja.fecha', 'trabaja.observacion')
-                ->get();
+            $departamentosActuales = Trabaja::with('departamento')
+                ->where('idEmpleado', $empleadoId)
+                ->get()
+                ->map(function($trabajo) {
+                    return [
+                        'departamento' => $trabajo->departamento,
+                        'fecha_asignacion' => $trabajo->fecha,
+                        'observacion' => $trabajo->observacion
+                    ];
+                });
 
             $historialAsignaciones = Trabaja::with('departamento')
                 ->where('idEmpleado', $empleadoId)

@@ -83,6 +83,29 @@ class InventarioController extends Controller
         }
     }
 
+    public function showProducto($id){
+        try{
+            $producto = Producto::with('categoria')->findOrFail($id);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $producto
+            ], 200);
+            
+        } catch (ModelNotFoundException $e){
+            return response()->json([
+                'success' => false,
+                'error' => 'Producto no encontrado'
+            ], 404);
+        } catch(\Exception $e){
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener el producto',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function updateProducto(Request $request, $id)
     {
         try {
@@ -178,6 +201,29 @@ class InventarioController extends Controller
                 'success' => false,
                 'error' => 'Error al obtener las categorías',
                 'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function showCategoria($id){
+        try{
+            $categoria=Categoria::findOrFail($id);
+
+            return response()->json([
+                'success'=> true,
+                'data' =>$categoria
+            ], 200);
+            
+        }catch (ModelNotFoundException $e){
+            return response()->json([
+                'success' => false,
+                'error'=>'categoria no encontrado',
+            ], 404);
+
+        }catch(\Exception $e){
+            return response()->json([
+                'success' => false,
+                'error'=>'Error al obtener al categoria',
+                'details'=> $e->getMessage()
             ], 500);
         }
     }
@@ -352,4 +398,29 @@ class InventarioController extends Controller
             ], 500);
         }
     }
+    public function showMovimiento($id){
+        try{
+            $movimiento=MovimientoInventario::with('empleado.persona', 'producto')->findOrFail($id);
+
+            return response()->json([
+                'success'=> true,
+                'data' =>$movimiento
+            ], 200);
+            
+        }catch (ModelNotFoundException $e){
+            return response()->json([
+                'success' => false,
+                'error'=>'Movimiento no encontrado',
+            ], 404);
+
+        }catch(\Exception $e){
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'error'=>'Error al obtener al Movimiento',
+                'details'=> $e->getMessage()
+            ], 500);
+        }
+    }
+    
 }

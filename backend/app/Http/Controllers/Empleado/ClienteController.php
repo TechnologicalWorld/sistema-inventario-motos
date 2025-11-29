@@ -8,6 +8,7 @@ use App\Models\Persona;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ClienteController extends Controller
 {
@@ -90,6 +91,30 @@ class ClienteController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        try {
+            $cliente = Cliente::with('persona')->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $cliente
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Cliente no encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener el cliente',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
     public function buscar($ci)
     {
         try {

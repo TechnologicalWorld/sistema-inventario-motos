@@ -313,4 +313,50 @@ class EmpleadoController extends Controller
             ], 500);
         }
     }
+    
+    public function show($id)
+    {
+        try {
+            $empleado = Empleado::with(['persona', 'departamentos'])->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $empleado
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Empleado no encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener el empleado',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function showHistorialEmpleado($id)
+    {
+        try {
+            $historial = Trabaja::with('departamento')
+                ->where('idEmpleado', $id)
+                ->orderBy('fecha', 'desc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $historial
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener el historial del empleado',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

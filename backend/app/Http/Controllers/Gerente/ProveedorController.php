@@ -143,6 +143,30 @@ class ProveedorController extends Controller
             ], 500);
         }
     }
+    
+    public function show($id)
+    {
+        try {
+            $proveedor = EmpresaProveedora::findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $proveedor
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Proveedor no encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener el proveedor',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
 
     public function comprasPorProveedor($id)
     {

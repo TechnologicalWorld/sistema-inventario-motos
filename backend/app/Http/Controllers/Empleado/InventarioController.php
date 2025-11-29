@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 
+
 class InventarioController extends Controller
 {
     public function index(Request $request)
@@ -60,4 +61,24 @@ class InventarioController extends Controller
             ], 500);
         }
     }
+
+    public function showProducto($id)
+    {
+        try {
+            $producto = Producto::with('categoria')->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $producto
+            ], 200);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Producto no encontrado',
+                'details' => $e->getMessage()
+            ], 404);
+        }
+    }   
 }

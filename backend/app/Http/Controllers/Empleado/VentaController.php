@@ -75,14 +75,29 @@ class VentaController extends Controller
                     'error' => 'Usuario no autenticado'
                 ], 401);
             }
+
+            // MEJORAR VALIDACIÓN DE STOCK
+            $productosInsuficientes = [];
             foreach ($request->detalles as $detalle) {
-                $producto = Producto::find($detalle['idProducto']);
+                $producto = Producto::activos()->find($detalle['idProducto']);
                 if (!$producto) {
-                    throw new \Exception("Producto no encontrado");
+                    throw new \Exception("Producto no encontrado o inactivo: ID {$detalle['idProducto']}");
                 }
                 if ($producto->stock < $detalle['cantidad']) {
-                    throw new \Exception("Stock insuficiente para el producto: {$producto->nombre}. Stock disponible: {$producto->stock}");
+                    $productosInsuficientes[] = [
+                        'producto' => $producto->nombre,
+                        'stock_disponible' => $producto->stock,
+                        'cantidad_solicitada' => $detalle['cantidad']
+                    ];
                 }
+            }
+
+            if (!empty($productosInsuficientes)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Stock insuficiente para algunos productos',
+                    'productos_insuficientes' => $productosInsuficientes
+                ], 422);
             }
 
             $venta = Venta::create([
@@ -91,7 +106,7 @@ class VentaController extends Controller
                 'metodoPago' => $request->metodoPago,
                 'descripcion' => $request->descripcion,
                 'idCliente' => $request->idCliente,
-                'idEmpleado' => $user->idEmpleado // CORREGIDO: idUsuario -> idEmpleado
+                'idEmpleado' => $user->idEmpleado
             ]);
 
             $totalVenta = 0;

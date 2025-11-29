@@ -2,30 +2,32 @@
 
 namespace App\Http\Controllers\Propietario;
 
+
 use App\Http\Controllers\Controller;
-use App\Models\EmpresaProveedora;
+use App\Models\Departamento;
+use App\Models\Empleado;
+use App\Models\Trabaja;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class ProveedorController extends Controller
+class DepartamentoController extends Controller
 {
     public function index()
     {
         try {
-            $proveedores = EmpresaProveedora::with(['compras' => function($query) {
-                $query->latest()->take(5);
-            }])->get();
+            $departamentos = Departamento::withCount('empleados')->get();
 
             return response()->json([
                 'success' => true,
-                'data' => $proveedores
+                'data' => $departamentos
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Error al obtener los proveedores',
+                'error' => 'Error al obtener los departamentos',
                 'details' => $e->getMessage()
             ], 500);
         }
@@ -34,10 +36,8 @@ class ProveedorController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:255',
-            'telefono' => 'required|string|max:20',
-            'contacto' => 'required|string|max:255',
-            'direccion' => 'required|string'
+            'nombre' => 'required|string|max:255|unique:departamento,nombre',
+            'descripcion' => 'nullable|string'
         ]);
 
         if ($validator->fails()) {
@@ -48,18 +48,18 @@ class ProveedorController extends Controller
         }
 
         try {
-            $proveedor = EmpresaProveedora::create($request->all());
+            $departamento = Departamento::create($request->all());
 
             return response()->json([
                 'success' => true,
-                'message' => 'Proveedor creado correctamente',
-                'data' => $proveedor
+                'message' => 'Departamento creado correctamente',
+                'data' => $departamento
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Error al crear proveedor',
+                'error' => 'Error al crear departamento',
                 'details' => $e->getMessage()
             ], 500);
         }
@@ -68,13 +68,11 @@ class ProveedorController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $proveedor = EmpresaProveedora::findOrFail($id);
+            $departamento = Departamento::findOrFail($id);
 
             $validator = Validator::make($request->all(), [
-                'nombre' => 'required|string|max:255',
-                'telefono' => 'required|string|max:20',
-                'contacto' => 'required|string|max:255',
-                'direccion' => 'required|string'
+                'nombre' => 'required|string|max:255|unique:departamento,nombre,' . $id . ',idDepartamento',
+                'descripcion' => 'nullable|string'
             ]);
 
             if ($validator->fails()) {
@@ -84,23 +82,23 @@ class ProveedorController extends Controller
                 ], 422);
             }
 
-            $proveedor->update($request->all());
+            $departamento->update($request->all());
 
             return response()->json([
                 'success' => true,
-                'message' => 'Proveedor actualizado correctamente',
-                'data' => $proveedor
+                'message' => 'Departamento actualizado correctamente',
+                'data' => $departamento
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Proveedor no encontrado'
+                'error' => 'Departamento no encontrado'
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Error al actualizar proveedor',
+                'error' => 'Error al actualizar departamento',
                 'details' => $e->getMessage()
             ], 500);
         }
@@ -109,31 +107,31 @@ class ProveedorController extends Controller
     public function destroy($id)
     {
         try {
-            $proveedor = EmpresaProveedora::findOrFail($id);
+            $departamento = Departamento::findOrFail($id);
             
-            if ($proveedor->compras()->exists()) {
+            if ($departamento->empleados()->exists()) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'No se puede eliminar el proveedor porque tiene compras asociadas'
+                    'error' => 'No se puede eliminar el departamento porque tiene empleados asignados'
                 ], 422);
             }
 
-            $proveedor->delete();
+            $departamento->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Proveedor eliminado correctamente'
+                'message' => 'Departamento eliminado correctamente'
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Proveedor no encontrado'
+                'error' => 'Departamento no encontrado'
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Error al eliminar proveedor',
+                'error' => 'Error al eliminar departamento',
                 'details' => $e->getMessage()
             ], 500);
         }
@@ -142,46 +140,75 @@ class ProveedorController extends Controller
     public function show($id)
     {
         try {
-            $proveedor = EmpresaProveedora::findOrFail($id);
+            $departamento = Departamento::with(['empleados.persona'])->findOrFail($id);
 
             return response()->json([
                 'success' => true,
-                'data' => $proveedor
+                'data' => $departamento
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Proveedor no encontrado'
+                'error' => 'Departamento no encontrado'
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Error al obtener el proveedor',
+                'error' => 'Error al obtener el departamento',
                 'details' => $e->getMessage()
             ], 500);
         }
     }
-    public function historialCompras($id)
+    public function empleadosPorDepartamento(Request $request, $id)
     {
         try {
-            $proveedor = EmpresaProveedora::with(['compras.detalleCompras.producto'])
-                ->findOrFail($id);
+            $empleado = Empleado::findOrFail($id);
+
+            $validator = Validator::make($request->all(), [
+                'departamentos' => 'required|array',
+                'departamentos.*' => 'exists:departamento,idDepartamento',
+                'observacion' => 'nullable|string|max:255'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            DB::beginTransaction();
+
+            Trabaja::where('idEmpleado', $empleado->idEmpleado)->delete();
+            
+            foreach ($request->departamentos as $departamentoId) {
+                Trabaja::create([
+                    'idEmpleado' => $empleado->idEmpleado,
+                    'idDepartamento' => $departamentoId,
+                    'fecha' => now()->toDateString(),
+                    'observacion' => $request->observacion ?? 'Asignación de departamentos'
+                ]);
+            }
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'data' => $proveedor
+                'message' => 'Departamentos asignados correctamente',
+                'data' => $empleado->load('departamentos')
             ], 200);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Proveedor no encontrado'
+                'error' => 'Empleado no encontrado'
             ], 404);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'error' => 'Error al obtener historial de compras',
+                'error' => 'Error al asignar departamentos',
                 'details' => $e->getMessage()
             ], 500);
         }

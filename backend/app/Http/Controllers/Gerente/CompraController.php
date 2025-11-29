@@ -75,11 +75,14 @@ class CompraController extends Controller
             }
 
             // Obtener el gerente autenticado - DIFERENTES OPCIONES
-            $gerente = Gerente::where('email', $user->email)->first();
+            $gerente = Gerente::find($user->idUsuario);
             
             // Si no funciona por email, intentar por idUsuario
             if (!$gerente) {
-                $gerente = Gerente::find($user->idUsuario);
+                return response()->json([
+                                'success' => false,
+                                'error' => 'Usuario no es un gerente válido'
+                            ], 403);
             }
             
             // Si aún no encontramos el gerente, buscar por relación con persona
