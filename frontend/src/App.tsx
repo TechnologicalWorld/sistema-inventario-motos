@@ -19,6 +19,7 @@ import ProductosPage from "./pages/gerente/inventario/productos/pages/ProductosP
 import CategoriasPage from "./pages/gerente/inventario/categorias/pages/CategoriasPage";
 import MovimientosPage from "./pages/gerente/inventario/movimientos/pages/MovimientosPage";
 import VentasPage from "./pages/gerente/ventas/pages/VentasPage";
+import ClientesPage from "./pages/gerente/clientes/pages/ClientesPage";
 
 /**
  * Dashboards temporales por rol
@@ -123,6 +124,12 @@ function App() {
         <Route
           path="gerente/ventas"
           element={<VentasPage />}
+        />
+
+        {/* Clientes - Gerente */}
+        <Route
+          path="gerente/clientes"
+          element={<ClientesPage />}
         />
 
         {/* Aquí luego puedes añadir más rutas del gerente, ej:
