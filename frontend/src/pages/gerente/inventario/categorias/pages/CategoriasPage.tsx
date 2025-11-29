@@ -1,4 +1,3 @@
-// src/pages/gerente/inventario/categorias/pages/CategoriasPage.tsx
 import { useEffect, useState } from "react";
 import {
   FiSearch,
@@ -43,7 +42,6 @@ export default function CategoriasPage() {
     null
   );
 
-  // Simulamos paginación simple en front (solo para los botones)
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const totalPages = Math.max(
@@ -197,15 +195,11 @@ export default function CategoriasPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-400 bg-gray-100 hover:bg-gray-200 transition">
-            <FiFilter />
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-400 bg-gray-100 hover:bg-gray-200 transition">
-            <FiTag />
-          </button>
+          
           <button
             onClick={handleRefresh}
             className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-400 bg-gray-100 hover:bg-gray-200 transition"
+            title="Actualizar lista"
           >
             <FiRefreshCcw />
           </button>
@@ -334,7 +328,7 @@ export default function CategoriasPage() {
         </table>
       </div>
 
-      {/* Paginación (front) */}
+      {/* Paginación */}
       <div className="mt-5 flex items-center justify-center gap-4">
         <button
           disabled={page <= 1}

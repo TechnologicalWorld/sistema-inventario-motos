@@ -1,4 +1,3 @@
-// src/pages/gerente/inventario/categorias/categorias.service.ts
 import api from "../../../../services/api";
 
 export interface Categoria {

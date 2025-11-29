@@ -1,4 +1,3 @@
-// src/App.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./hooks/useAuth";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -18,32 +17,30 @@ import { Perfil } from "./services/shared/Perfil";
 import ProductosPage from "./pages/gerente/inventario/productos/pages/ProductosPage";
 import CategoriasPage from "./pages/gerente/inventario/categorias/pages/CategoriasPage";
 import MovimientosPage from "./pages/gerente/inventario/movimientos/pages/MovimientosPage";
+import VentasPage from "./pages/gerente/ventas/pages/VentasPage";
+import ClientesPage from "./pages/gerente/clientes/pages/ClientesPage";
+import ComprasPage from "./pages/gerente/compras/pages/ComprasPage";
+import ProveedoresPage from "./pages/gerente/proveedores/pages/ProveedoresPage";
+import EmpleadosPage from "./pages/gerente/empleados/pages/EmpleadosPage";
 
 /**
  * Dashboards temporales por rol
- * (Puedes reemplazarlos por tus propios componentes reales)
  */
 const GerenteDashboard = () => (
   <div className="p-4">
-    <h1 className="text-xl font-semibold">
-      Dashboard GERENTE (reemplazar por tu componente real)
-    </h1>
+    <h1 className="text-xl font-semibold">Dashboard GERENTE</h1>
   </div>
 );
 
 const EmpleadoDashboard = () => (
   <div className="p-4">
-    <h1 className="text-xl font-semibold">
-      Dashboard EMPLEADO (reemplazar por tu componente real)
-    </h1>
+    <h1 className="text-xl font-semibold">Dashboard EMPLEADO</h1>
   </div>
 );
 
 const PropietarioDashboard = () => (
   <div className="p-4">
-    <h1 className="text-xl font-semibold">
-      Dashboard PROPIETARIO (reemplazar por tu componente real)
-    </h1>
+    <h1 className="text-xl font-semibold">Dashboard PROPIETARIO</h1>
   </div>
 );
 
@@ -99,53 +96,39 @@ function App() {
         {/* RUTAS PARA ROL: GERENTE        */}
         {/* Prefix: /gerente/...           */}
         {/* ============================== */}
-        <Route
-          path="gerente/dashboard"
-          element={<GerenteDashboard />}
-        />
+        <Route path="gerente/dashboard" element={<GerenteDashboard />} />
 
         {/* Inventarios - Gerente */}
-        <Route
-          path="gerente/inventarios/productos"
-          element={<ProductosPage />}
-        />
-        <Route
-          path="gerente/inventarios/categorias"
-          element={<CategoriasPage />}
-        />
-        <Route
-          path="gerente/inventarios/movimientos"
-          element={<MovimientosPage />}
-        />
+        <Route path="gerente/inventarios/productos" element={<ProductosPage />}/>
+        <Route path="gerente/inventarios/categorias" element={<CategoriasPage />}/>
+        <Route path="gerente/inventarios/movimientos" element={<MovimientosPage />}/>
 
-        {/* Aquí luego puedes añadir más rutas del gerente, ej:
-            <Route path="gerente/reportes" element={<ReportesGerente />} />
-        */}
+        {/* Ventas - Gerente */}
+        <Route path="gerente/ventas" element={<VentasPage />} />
+
+        {/* Clientes - Gerente */}
+        <Route path="gerente/clientes" element={<ClientesPage />} />
+
+        {/* Compras - Gerente */}
+        <Route path="gerente/compras" element={<ComprasPage />} />
+
+        {/* Proveedores - Gerente */}
+        <Route path="gerente/proveedores" element={<ProveedoresPage />} />
+
+        {/* Empleados - Gerente */}
+        <Route path="gerente/empleados" element={<EmpleadosPage />} />
 
         {/* ============================== */}
         {/* RUTAS PARA ROL: EMPLEADO       */}
         {/* Prefix: /empleado/...          */}
         {/* ============================== */}
-        <Route
-          path="empleado/dashboard"
-          element={<EmpleadoDashboard />}
-        />
-        {/* Ejemplos futuros:
-            <Route path="empleado/ventas" element={<VentasEmpleado />} />
-            <Route path="empleado/clientes" element={<ClientesEmpleado />} />
-        */}
+        <Route path="empleado/dashboard" element={<EmpleadoDashboard />} />
 
         {/* ============================== */}
         {/* RUTAS PARA ROL: PROPIETARIO    */}
         {/* Prefix: /propietario/...       */}
         {/* ============================== */}
-        <Route
-          path="propietario/dashboard"
-          element={<PropietarioDashboard />}
-        />
-        {/* Ejemplos futuros:
-            <Route path="propietario/reportes" element={<ReportesPropietario />} />
-        */}
+        <Route path="propietario/dashboard" element={<PropietarioDashboard />}/>
 
         {/* ===================================================== */}
         {/* Ruta por defecto dentro del layout protegido          */}

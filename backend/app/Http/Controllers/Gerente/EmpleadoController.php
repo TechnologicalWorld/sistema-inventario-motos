@@ -279,7 +279,7 @@ class EmpleadoController extends Controller
             DB::beginTransaction();
 
             // Eliminar asignaciones existentes
-            Trabaja::where('idEmpleado', $empleado->idEmpleado)->delete();
+            //Trabaja::where('idEmpleado', $empleado->idEmpleado)->delete();
             
             // Crear nuevas asignaciones con fecha y observación
             foreach ($request->departamentos as $departamentoId) {
