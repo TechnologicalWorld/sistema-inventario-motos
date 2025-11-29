@@ -18,6 +18,8 @@ import { Perfil } from "./services/shared/Perfil";
 import ProductosPage from "./pages/gerente/inventario/productos/pages/ProductosPage";
 import CategoriasPage from "./pages/gerente/inventario/categorias/pages/CategoriasPage";
 import MovimientosPage from "./pages/gerente/inventario/movimientos/pages/MovimientosPage";
+import VentasPage from "./pages/gerente/ventas/pages/VentasPage";
+import ClientesPage from "./pages/gerente/clientes/pages/ClientesPage";
 
 /**
  * Dashboards temporales por rol
@@ -26,7 +28,7 @@ import MovimientosPage from "./pages/gerente/inventario/movimientos/pages/Movimi
 const GerenteDashboard = () => (
   <div className="p-4">
     <h1 className="text-xl font-semibold">
-      Dashboard GERENTE (reemplazar por tu componente real)
+      Dashboard GERENTE
     </h1>
   </div>
 );
@@ -34,7 +36,7 @@ const GerenteDashboard = () => (
 const EmpleadoDashboard = () => (
   <div className="p-4">
     <h1 className="text-xl font-semibold">
-      Dashboard EMPLEADO (reemplazar por tu componente real)
+      Dashboard EMPLEADO 
     </h1>
   </div>
 );
@@ -42,7 +44,7 @@ const EmpleadoDashboard = () => (
 const PropietarioDashboard = () => (
   <div className="p-4">
     <h1 className="text-xl font-semibold">
-      Dashboard PROPIETARIO (reemplazar por tu componente real)
+      Dashboard PROPIETARIO 
     </h1>
   </div>
 );
@@ -113,6 +115,18 @@ function App() {
         <Route
           path="gerente/inventarios/movimientos"
           element={<MovimientosPage />}
+        />
+
+        {/* Ventas - Gerente */}
+        <Route
+          path="gerente/ventas"
+          element={<VentasPage />}
+        />
+
+        {/* Clientes - Gerente */}
+        <Route
+          path="gerente/clientes"
+          element={<ClientesPage />}
         />
 
         {/* Aquí luego puedes añadir más rutas del gerente, ej:

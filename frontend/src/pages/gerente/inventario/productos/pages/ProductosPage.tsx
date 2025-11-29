@@ -1,4 +1,3 @@
-// src/pages/gerente/inventario/productos/pages/ProductosPage.tsx
 import { useEffect, useMemo, useState } from "react";
 import {
   FiSearch,
@@ -68,11 +67,11 @@ export default function ProductosPage() {
   const [search, setSearch] = useState("");
   const [categoriaFiltro, setCategoriaFiltro] = useState<string>("");
   const [modalMode, setModalMode] = useState<ModalMode>(null);
-  const [selectedProducto, setSelectedProducto] =
-    useState<Producto | null>(null);
+  const [selectedProducto, setSelectedProducto] = useState<Producto | null>(null);
   const [form, setForm] = useState<ProductoFormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [estadoFiltro, setEstadoFiltro] = useState<string>("");
 
   // ---------------- Cargar datos ----------------
 
@@ -164,50 +163,47 @@ export default function ProductosPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSaving(true);
     setErrorMsg(null);
+    setSaving(true);
 
     try {
-      const payload = {
-        nombre: form.nombre,
-        codigoProducto: form.codigoProducto,
-        descripcion: form.descripcion || null,
-        precioVenta: Number(form.precioVenta),
+        const payloadBase = {
+        ...form,
         precioCompra: Number(form.precioCompra),
+        precioVenta: Number(form.precioVenta),
         stock: Number(form.stock),
         stockMinimo: Number(form.stockMinimo),
-        estado: form.estado,
-        idCategoria: Number(form.idCategoria),
-      };
+        };
 
-      if (modalMode === "create") {
-        await productosService.createProducto(payload as any);
-      } else if (
-        modalMode === "edit" &&
-        form.idProducto
-      ) {
+        if (modalMode === "create") {
+        await productosService.createProducto({
+            ...payloadBase,
+            estado: "activo",
+        });
+
+        await loadProductos(1);
+        } else if (modalMode === "edit" && form.idProducto) {
         await productosService.updateProducto(
-          form.idProducto,
-          payload as any
+            form.idProducto,
+            payloadBase
         );
-      }
 
-      await loadProductos(page);
-      closeModal();
+        await loadProductos(page);
+        }
+
+        closeModal();
     } catch (error: any) {
-      console.error(error);
-      const msg =
+        console.error(error);
+        setErrorMsg(
         error?.response?.data?.error ||
-        "Error al guardar el producto";
-      setErrorMsg(msg);
+            "Ocurrió un error al guardar el producto."
+        );
     } finally {
-      setSaving(false);
+        setSaving(false);
     }
-  };
+    };
 
   const handleDelete = async (producto: Producto) => {
     if (
@@ -231,6 +227,7 @@ export default function ProductosPage() {
   const handleRefresh = () => {
     setSearch("");
     setCategoriaFiltro("");
+    setEstadoFiltro("");
     loadProductos(page);
   };
 
@@ -244,6 +241,21 @@ export default function ProductosPage() {
       getEstadoColorClasses(p.stock, p.stockMinimo),
     []
   );
+
+  const filteredProductos = useMemo(() => {
+    return productos.filter((p) => {
+        if (!estadoFiltro) return true; 
+
+        const texto = getEstadoTexto(p.stock, p.stockMinimo); 
+
+        if (estadoFiltro === "critico") return texto === "Crítico";
+        if (estadoFiltro === "minimo") return texto === "Mínimo";
+        if (estadoFiltro === "ok") return texto === "Ok";
+
+        return true;
+    });
+  }, [productos, estadoFiltro]);
+
 
   // ---------------- Render ----------------
 
@@ -259,15 +271,11 @@ export default function ProductosPage() {
 
         {/* Botones de acción en el header derecho */}
         <div className="flex items-center gap-2">
-          <button className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-400 bg-gray-100 hover:bg-gray-200 transition">
-            <FiFilter />
-          </button>
-          <button className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-400 bg-gray-100 hover:bg-gray-200 transition">
-            <FiTag />
-          </button>
+          
           <button
             onClick={handleRefresh}
             className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-400 bg-gray-100 hover:bg-gray-200 transition"
+            title="Actualizar lista"          
           >
             <FiRefreshCcw />
           </button>
@@ -300,17 +308,30 @@ export default function ProductosPage() {
             className="border border-gray-400 rounded-full px-4 py-2 text-sm bg-white"
             value={categoriaFiltro}
             onChange={(e) => setCategoriaFiltro(e.target.value)}
-          >
+            >
             <option value="">Categoría</option>
             {categorias.map((c) => (
-              <option
+                <option
                 key={c.idCategoria}
                 value={c.idCategoria}
-              >
+                >
                 {c.nombre}
-              </option>
+                </option>
             ))}
           </select>
+
+          <select
+            className="border border-gray-400 rounded-full px-4 py-2 text-sm bg-white"
+            value={estadoFiltro}
+            onChange={(e) => setEstadoFiltro(e.target.value)}
+            >
+            <option value="">Estado</option>
+            <option value="critico">Crítico</option>
+            <option value="minimo">Mínimo</option>
+            <option value="ok">Ok</option>
+          </select>
+  
+
         </div>
 
         <div>
@@ -381,7 +402,7 @@ export default function ProductosPage() {
             )}
 
             {!loading &&
-              productos.map((p, idx) => {
+              filteredProductos.map((p, idx) => {
                 const estado = estadoClases(p);
                 return (
                   <tr
@@ -491,96 +512,97 @@ export default function ProductosPage() {
       </div>
 
       {/* Modal Crear/Editar */}
-      {(modalMode === "create" || modalMode === "edit") && (
+        {(modalMode === "create" || modalMode === "edit") && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <form
+            <form
             onSubmit={handleSubmit}
-            className="bg-[#f5ede8] w-full max-w-xl rounded-md shadow-lg border border-gray-400"
-          >
+            className="
+                bg-[#f5ede8]
+                w-[95%]
+                max-w-lg
+                rounded-md
+                shadow-lg
+                border
+                border-gray-400
+                max-h-[90vh]
+                overflow-y-auto
+            "
+            >
+            {/* CABECERA */}
             <div className="bg-[#e5ddda] px-6 py-3 rounded-t-md text-center">
-              <h2 className="font-semibold text-lg text-gray-800">
-                {modalMode === "create"
-                  ? "NUEVO PRODUCTO"
-                  : "EDITAR PRODUCTO"}
-              </h2>
+                <h2 className="font-semibold text-lg text-gray-800">
+                {modalMode === "create" ? "NUEVO PRODUCTO" : "EDITAR PRODUCTO"}
+                </h2>
             </div>
 
+            {/* CUERPO */}
             <div className="px-6 py-4 space-y-3">
-              {errorMsg && (
+                {errorMsg && (
                 <div className="mb-2 text-sm text-red-600">
-                  {errorMsg}
+                    {errorMsg}
                 </div>
-              )}
+                )}
 
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-sm">
-                  Nombre:
-                </label>
-                <input
-                  name="nombre"
-                  value={form.nombre}
-                  onChange={handleChange}
-                  className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
-                  required
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-sm">
-                  Código:
-                </label>
-                <input
-                  name="codigoProducto"
-                  value={form.codigoProducto}
-                  onChange={handleChange}
-                  className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
-                  required
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-sm">
-                  Categoría:
-                </label>
-                <select
-                  name="idCategoria"
-                  value={form.idCategoria}
-                  onChange={handleChange}
-                  className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
-                  required
-                >
-                  <option value="">
-                    Seleccionar
-                  </option>
-                  {categorias.map((c) => (
-                    <option
-                      key={c.idCategoria}
-                      value={c.idCategoria}
-                    >
-                      {c.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-sm">
-                  Descripción:
-                </label>
-                <textarea
-                  name="descripcion"
-                  value={form.descripcion}
-                  onChange={handleChange}
-                  className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white resize-none h-20"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+                {/* Nombre */}
                 <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-sm">
-                    Precio Compra:
-                  </label>
-                  <input
+                <label className="font-semibold text-sm">Nombre:</label>
+                <input
+                    name="nombre"
+                    value={form.nombre}
+                    onChange={handleChange}
+                    className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
+                    required
+                />
+                </div>
+
+                {/* Código */}
+                <div className="flex flex-col gap-1">
+                <label className="font-semibold text-sm">Código:</label>
+                <input
+                    name="codigoProducto"
+                    value={form.codigoProducto}
+                    onChange={handleChange}
+                    className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
+                    required
+                />
+                </div>
+
+                {/* Categoría */}
+                <div className="flex flex-col gap-1">
+                <label className="font-semibold text-sm">Categoría:</label>
+                <select
+                    name="idCategoria"
+                    value={form.idCategoria}
+                    onChange={handleChange}
+                    className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
+                    required
+                >
+                    <option value="">Seleccionar</option>
+                    {categorias.map((c) => (
+                    <option key={c.idCategoria} value={c.idCategoria}>
+                        {c.nombre}
+                    </option>
+                    ))}
+                </select>
+                </div>
+
+                {/* Descripción */}
+                <div className="flex flex-col gap-1">
+                <label className="font-semibold text-sm">Descripción:</label>
+                <textarea
+                    name="descripcion"
+                    value={form.descripcion}
+                    onChange={handleChange}
+                    className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white resize-none h-20"
+                    required
+                />
+                </div>
+
+                {/* Precios y stocks */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                    <label className="font-semibold text-sm">Precio Compra:</label>
+                    <input
                     type="number"
                     step="0.01"
                     name="precioCompra"
@@ -588,14 +610,12 @@ export default function ProductosPage() {
                     onChange={handleChange}
                     className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
                     required
-                  />
+                    />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-sm">
-                    Precio Venta:
-                  </label>
-                  <input
+                    <label className="font-semibold text-sm">Precio Venta:</label>
+                    <input
                     type="number"
                     step="0.01"
                     name="precioVenta"
@@ -603,78 +623,58 @@ export default function ProductosPage() {
                     onChange={handleChange}
                     className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
                     required
-                  />
+                    />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-sm">
-                    Stock:
-                  </label>
-                  <input
+                    <label className="font-semibold text-sm">Stock:</label>
+                    <input
                     type="number"
                     name="stock"
                     value={form.stock}
                     onChange={handleChange}
                     className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
                     required
-                  />
+                    />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="font-semibold text-sm">
-                    Stock Mínimo:
-                  </label>
-                  <input
+                    <label className="font-semibold text-sm">Stock Mínimo:</label>
+                    <input
                     type="number"
                     name="stockMinimo"
                     value={form.stockMinimo}
                     onChange={handleChange}
                     className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
                     required
-                  />
+                    />
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="font-semibold text-sm">
-                  Estado:
-                </label>
-                <select
-                  name="estado"
-                  value={form.estado}
-                  onChange={handleChange}
-                  className="border border-gray-400 rounded-sm px-3 py-1.5 text-sm bg-white"
-                  required
-                >
-                  <option value="activo">Activo</option>
-                  <option value="inactivo">
-                    Inactivo
-                  </option>
-                </select>
-              </div>
+                </div>
             </div>
 
-            <div className="px-6 py-3 flex justify-start gap-3">
-              <button
+            {/* FOOTER */}
+            <div className="px-6 py-3 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-start">
+                <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 rounded-sm bg-green-600 text-white text-sm hover:bg-green-700 disabled:opacity-60"
-              >
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-sm bg-green-600 text-white text-sm hover:bg-green-700 disabled:opacity-60"
+                >
                 {modalMode === "create"
-                  ? "Guardar nuevo producto"
-                  : "Guardar cambios"}
-              </button>
-              <button
+                    ? "Guardar nuevo producto"
+                    : "Guardar cambios"}
+                </button>
+                <button
                 type="button"
                 onClick={closeModal}
                 className="px-4 py-2 rounded-sm bg-gray-600 text-white text-sm hover:bg-gray-700"
-              >
+                >
                 Cancelar
-              </button>
+                </button>
             </div>
-          </form>
+            </form>
         </div>
-      )}
+        )}
+
 
       {/* Modal Detalle */}
       {modalMode === "detail" && selectedProducto && (
