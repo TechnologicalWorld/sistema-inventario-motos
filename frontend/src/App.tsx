@@ -99,10 +99,7 @@ function App() {
         {/* RUTAS PARA ROL: GERENTE        */}
         {/* Prefix: /gerente/...           */}
         {/* ============================== */}
-        <Route
-          path="gerente/dashboard"
-          element={<GerenteDashboard />}
-        />
+        <Route path="gerente/dashboard" element={<GerenteDashboard />} />
 
         {/* Inventarios - Gerente */}
         <Route
@@ -126,10 +123,7 @@ function App() {
         {/* RUTAS PARA ROL: EMPLEADO       */}
         {/* Prefix: /empleado/...          */}
         {/* ============================== */}
-        <Route
-          path="empleado/dashboard"
-          element={<EmpleadoDashboard />}
-        />
+        <Route path="empleado/dashboard" element={<EmpleadoDashboard />} />
         {/* Ejemplos futuros:
             <Route path="empleado/ventas" element={<VentasEmpleado />} />
             <Route path="empleado/clientes" element={<ClientesEmpleado />} />
