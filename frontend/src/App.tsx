@@ -22,6 +22,7 @@ import ClientesPage from "./pages/gerente/clientes/pages/ClientesPage";
 import ComprasPage from "./pages/gerente/compras/pages/ComprasPage";
 import ProveedoresPage from "./pages/gerente/proveedores/pages/ProveedoresPage";
 import EmpleadosPage from "./pages/gerente/empleados/pages/EmpleadosPage";
+import DepartamentosPage from "./pages/gerente/departamentos/pages/DepartamentosPage";
 
 /**
  * Dashboards temporales por rol
@@ -117,6 +118,9 @@ function App() {
 
         {/* Empleados - Gerente */}
         <Route path="gerente/empleados" element={<EmpleadosPage />} />
+
+        {/* Departamentos - Gerente */}
+        <Route path="gerente/departamentos" element={<DepartamentosPage />} />
 
         {/* ============================== */}
         {/* RUTAS PARA ROL: EMPLEADO       */}
