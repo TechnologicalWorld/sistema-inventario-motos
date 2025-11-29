@@ -219,3 +219,14 @@ export async function fetchProductosOptions(): Promise<ProductoOption[]> {
     return [];
   }
 }
+
+// ===== Facade tipo "service" =====
+export const comprasService = {
+  getCompras,
+  getCompraById,
+  createCompra,
+  fetchProveedoresOptions,
+  fetchProductosOptions,
+};
+
+export default comprasService;
