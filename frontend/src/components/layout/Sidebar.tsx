@@ -191,7 +191,7 @@ const propietarioMenu: MenuItem[] = [
     children: [
       {
         label: "Proveedores",
-        to: "/proveedores",
+        to: "/propietario/proveedores",
         icon: <FiTruck className="text-sm" />,
       },
       {
