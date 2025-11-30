@@ -208,7 +208,7 @@ const propietarioMenu: MenuItem[] = [
     children: [
       {
         label: "Productos",
-        to: "/productos",
+        to: "/propietario/productos",
         icon: <FiBox className="text-sm" />,
       },
       {
@@ -225,12 +225,12 @@ const propietarioMenu: MenuItem[] = [
     children: [
       {
         label: "Ventas",
-        to: "/ventas",
+        to: "/propietario/ventas",
         icon: <FiBarChart2 className="text-sm" />,
       },
       {
         label: "Compras",
-        to: "/compras",
+        to: "/propietario/compras",
         icon: <FiShoppingBag className="text-sm" />,
       },
     ],

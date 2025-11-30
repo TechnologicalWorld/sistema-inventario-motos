@@ -26,6 +26,8 @@ import DepartamentosPage from "./pages/gerente/departamentos/pages/Departamentos
 import ClientesPagePro from "./pages/propietario/clientes/pages/ClientesPagePro";
 import EmpresaPagePro from "./pages/propietario/empresa/pages/EmpresaPagePro";
 import ProveedoresPagePro from "./pages/propietario/proveedores/pages/ProveedoresPagePro";
+import ComprasPagePro from "./pages/propietario/compras/pages/ComprasPagePro";
+import VentasPagePro from "./pages/propietario/ventas/pages/VentasPagePro";
 /**
  * Dashboards temporales por rol
  */
@@ -138,6 +140,8 @@ function App() {
         <Route path="propietario/empresa" element={<EmpresaPagePro />}/>
         <Route path="propietario/proveedores" element={<ProveedoresPagePro/>}/>
         <Route path="propietario/clientes" element={<ClientesPagePro/>}/>
+        <Route path="propietario/compras" element={<ComprasPagePro/>}/>
+        <Route path="propietario/ventas" element={<VentasPagePro/>}/>
         {/* ===================================================== */}
         {/* Ruta por defecto dentro del layout protegido          */}
         {/* Si entras a /gerente, /empleado, etc sin path final,  */}
