@@ -196,7 +196,7 @@ const propietarioMenu: MenuItem[] = [
       },
       {
         label: "Clientes",
-        to: "/clientes",
+        to: "/propietario/clientes",
         icon: <FiUsers className="text-sm" />,
       },
     ],
