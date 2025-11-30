@@ -182,7 +182,7 @@ const propietarioMenu: MenuItem[] = [
     id: "prop-empresa",
     label: "Empresa",
     icon: <FiBriefcase className="text-lg" />,
-    to: "/empresa",
+    to: "/propietario/empresa",
   },
   {
     id: "prop-gestion",
@@ -191,12 +191,12 @@ const propietarioMenu: MenuItem[] = [
     children: [
       {
         label: "Proveedores",
-        to: "/proveedores",
+        to: "/propietario/proveedores",
         icon: <FiTruck className="text-sm" />,
       },
       {
         label: "Clientes",
-        to: "/clientes",
+        to: "/propietario/clientes",
         icon: <FiUsers className="text-sm" />,
       },
     ],
