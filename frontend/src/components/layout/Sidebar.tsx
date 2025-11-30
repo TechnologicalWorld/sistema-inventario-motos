@@ -21,7 +21,6 @@ import {
 import { useAuth } from "../../hooks/useAuth";
 import type { UserRole } from "../../types/auth";
 import marcaRuedas from "../../assets/marca_ruedas.png";
-
 // -------------------- Tipos --------------------
 
 interface SidebarProps {
@@ -176,7 +175,7 @@ const propietarioMenu: MenuItem[] = [
     id: "prop-dashboard",
     label: "Dashboard",
     icon: <FiHome className="text-lg" />,
-    to: "/dashboard",
+    to: "/propietario/dashboard",
   },
   {
     id: "prop-empresa",

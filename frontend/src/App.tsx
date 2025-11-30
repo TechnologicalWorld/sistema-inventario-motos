@@ -10,7 +10,7 @@ import { Unauthorized } from "./pages/auth/Unauthorized";
 // Layout
 import DashboardLayout from "./components/layout/Layout";
 import { Perfil } from "./services/shared/Perfil";
-
+import DashboardPropietario from "./pages/propietario/dashboard/pages/DashboardPropietario";
 // ========================
 // GERENTE - Inventarios
 // ========================
@@ -134,7 +134,7 @@ function App() {
         {/* RUTAS PARA ROL: PROPIETARIO    */}
         {/* Prefix: /propietario/...       */}
         {/* ============================== */}
-        <Route path="propietario/dashboard" element={<PropietarioDashboard />}/>
+        <Route path="propietario/dashboard" element={<DashboardPropietario />}/>
         <Route path="propietario/empresa" element={<EmpresaPagePro />}/>
         <Route path="propietario/proveedores" element={<ProveedoresPagePro/>}/>
         <Route path="propietario/clientes" element={<ClientesPagePro/>}/>
