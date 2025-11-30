@@ -24,6 +24,7 @@ import ProveedoresPage from "./pages/gerente/proveedores/pages/ProveedoresPage";
 import EmpleadosPage from "./pages/gerente/empleados/pages/EmpleadosPage";
 import DepartamentosPage from "./pages/gerente/departamentos/pages/DepartamentosPage";
 import ClientesPagePro from "./pages/propietario/clientes/pages/ClientesPagePro";
+import EmpresaPagePro from "./pages/propietario/empresa/pages/EmpresaPagePro";
 /**
  * Dashboards temporales por rol
  */
@@ -133,6 +134,7 @@ function App() {
         {/* Prefix: /propietario/...       */}
         {/* ============================== */}
         <Route path="propietario/dashboard" element={<PropietarioDashboard />}/>
+        <Route path="propietario/empresa" element={<EmpresaPagePro />}/>
         <Route path="propietario/clientes" element={<ClientesPagePro/>}/>
         {/* ===================================================== */}
         {/* Ruta por defecto dentro del layout protegido          */}

@@ -182,7 +182,7 @@ const propietarioMenu: MenuItem[] = [
     id: "prop-empresa",
     label: "Empresa",
     icon: <FiBriefcase className="text-lg" />,
-    to: "/empresa",
+    to: "/propietario/empresa",
   },
   {
     id: "prop-gestion",
