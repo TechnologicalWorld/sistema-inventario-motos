@@ -137,14 +137,27 @@ class DepartamentoController extends Controller
         }
     }
 
-    public function show($id)
+    public function empleadosPorDepartamento($id)
     {
         try {
             $departamento = Departamento::with(['empleados.persona'])->findOrFail($id);
 
             return response()->json([
                 'success' => true,
-                'data' => $departamento
+                'data' => [
+                    'departamento' => $departamento->nombre,
+                    'total_empleados' => $departamento->empleados->count(),
+                    'empleados' => $departamento->empleados->map(function($empleado) {
+                        return [
+                            'id' => $empleado->idEmpleado,
+                            'nombre_completo' => $empleado->persona->nombres . ' ' . $empleado->persona->paterno . ' ' . $empleado->persona->materno,
+                            'ci' => $empleado->persona->ci,
+                            'telefono' => $empleado->persona->telefono,
+                            'fecha_contratacion' => $empleado->fecha_contratacion,
+                            'email' => $empleado->email
+                        ];
+                    })
+                ]
             ], 200);
 
         } catch (ModelNotFoundException $e) {
@@ -155,62 +168,10 @@ class DepartamentoController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Error al obtener el departamento',
+                'error' => 'Error al obtener empleados del departamento',
                 'details' => $e->getMessage()
             ], 500);
         }
     }
-    public function empleadosPorDepartamento(Request $request, $id)
-    {
-        try {
-            $empleado = Empleado::findOrFail($id);
 
-            $validator = Validator::make($request->all(), [
-                'departamentos' => 'required|array',
-                'departamentos.*' => 'exists:departamento,idDepartamento',
-                'observacion' => 'nullable|string|max:255'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            DB::beginTransaction();
-
-            Trabaja::where('idEmpleado', $empleado->idEmpleado)->delete();
-            
-            foreach ($request->departamentos as $departamentoId) {
-                Trabaja::create([
-                    'idEmpleado' => $empleado->idEmpleado,
-                    'idDepartamento' => $departamentoId,
-                    'fecha' => now()->toDateString(),
-                    'observacion' => $request->observacion ?? 'Asignación de departamentos'
-                ]);
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Departamentos asignados correctamente',
-                'data' => $empleado->load('departamentos')
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Empleado no encontrado'
-            ], 404);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'error' => 'Error al asignar departamentos',
-                'details' => $e->getMessage()
-            ], 500);
-        }
-    }
 }

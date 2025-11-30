@@ -138,8 +138,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [DepartamentoController::class, 'store']);
             Route::put('/{id}', [DepartamentoController::class, 'update']);
             Route::delete('/{id}', [DepartamentoController::class, 'destroy']);
-            Route::get('/{id}', [DepartamentoController::class, 'show']);
-            Route::get('/{id}/empleados', [DepartamentoController::class, 'empleadosPorDepartamento']);
+            Route::get('/{id}', [DepartamentoController::class, 'empleadosPorDepartamento']);
         });
         
         // Empleados
@@ -148,7 +147,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [EmpleadoController::class, 'store']);
             Route::put('/{id}', [EmpleadoController::class, 'update']);
             Route::delete('/{id}', [EmpleadoController::class, 'destroy']);
-            Route::get('/{id}', [EmpleadoController::class, 'show']);
             Route::get('/{id}/desempenio', [EmpleadoController::class, 'desempenio']);
         });
         

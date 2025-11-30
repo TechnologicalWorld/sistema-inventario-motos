@@ -46,6 +46,41 @@ class EmpleadoController extends Controller
             ], 500);
         }
     }
+    
+    public function desempenio($id)
+    {
+        try {
+            $empleado = Empleado::with(['persona', 'ventas' => function($query) {
+                $query->with('detalleVentas')->latest()->take(10);
+            }, 'movimientos' => function($query) {
+                $query->with('producto')->latest()->take(10);
+            }])->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'empleado' => $empleado,
+                    'estadisticas' => [
+                        'total_ventas' => $empleado->total_ventas,
+                        'monto_total_ventas' => $empleado->monto_total_ventas,
+                        'total_movimientos' => $empleado->total_movimientos
+                    ]
+                ]
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Empleado no encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al obtener el desempeño del empleado',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
 
     public function store (Request $request){
 
@@ -219,25 +254,44 @@ class EmpleadoController extends Controller
             ], 500);
         }
     }
-    public function desempenio($id)
+
+    public function asignarDepartamentos(Request $request, $id)
     {
         try {
-            $empleado = Empleado::with(['persona', 'ventas' => function($query) {
-                $query->with('detalleVentas')->latest()->take(10);
-            }, 'movimientos' => function($query) {
-                $query->with('producto')->latest()->take(10);
-            }])->findOrFail($id);
+            $empleado = Empleado::findOrFail($id);
+
+            $validator = Validator::make($request->all(), [
+                'departamentos' => 'required|array',
+                'departamentos.*' => 'exists:departamento,idDepartamento',
+                'observacion' => 'nullable|string|max:255'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            DB::beginTransaction();
+
+            Trabaja::where('idEmpleado', $empleado->idEmpleado)->delete();
+            
+            foreach ($request->departamentos as $departamentoId) {
+                Trabaja::create([
+                    'idEmpleado' => $empleado->idEmpleado,
+                    'idDepartamento' => $departamentoId,
+                    'fecha' => now()->toDateString(),
+                    'observacion' => $request->observacion ?? 'Asignación de departamentos'
+                ]);
+            }
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'empleado' => $empleado,
-                    'estadisticas' => [
-                        'total_ventas' => $empleado->total_ventas,
-                        'monto_total_ventas' => $empleado->monto_total_ventas,
-                        'total_movimientos' => $empleado->total_movimientos
-                    ]
-                ]
+                'message' => 'Departamentos asignados correctamente',
+                'data' => $empleado->load('departamentos')
             ], 200);
 
         } catch (ModelNotFoundException $e) {
@@ -246,9 +300,10 @@ class EmpleadoController extends Controller
                 'error' => 'Empleado no encontrado'
             ], 404);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'error' => 'Error al obtener el desempeño del empleado',
+                'error' => 'Error al asignar departamentos',
                 'details' => $e->getMessage()
             ], 500);
         }
