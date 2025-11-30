@@ -282,58 +282,61 @@ export default function ProductosPage() {
         </div>
       </div>
 
-      {/* Buscador + Filtro + Botón agregar */}
-      <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
-        <div className="flex items-center gap-2 flex-1 min-w-[260px]">
-          <div className="flex items-center bg-white border border-gray-400 rounded-full overflow-hidden flex-1">
-            <span className="px-3 text-gray-500">
-              <FiSearch />
-            </span>
-            <input
-              type="text"
-              placeholder="Buscar Producto..."
-              className="flex-1 px-2 py-2 text-sm outline-none"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+      {/* Buscador + Filtros + Botón agregar */}
+      <div className="flex flex-wrap items-center justify-between mb-5 gap-4">
+        {/* IZQUIERDA: buscador + filtros */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Buscador */}
+          <div className="flex items-center">
+            <div className="flex items-center bg-white border border-gray-400 rounded-l-full px-3 py-1.5 min-w-[260px]">
+              <span className="text-gray-500 mr-2">
+                <FiSearch />
+              </span>
+              <input
+                type="text"
+                placeholder="Buscar Producto..."
+                className="flex-1 text-sm outline-none"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && loadProductos(1)}
+              />
+            </div>
+            <button
+              onClick={() => loadProductos(1)}
+              className="px-5 py-1.5 rounded-r-full bg-black text-white text-sm hover:bg-gray-900 transition -ml-px"
+            >
+              Buscar
+            </button>
           </div>
-          <button
-            onClick={() => loadProductos(1)}
-            className="px-5 py-2 rounded-full bg-black text-white text-sm hover:bg-gray-900 transition"
-          >
-            Buscar
-          </button>
 
+          {/* Filtro Categoría */}
           <select
-            className="border border-gray-400 rounded-full px-4 py-2 text-sm bg-white"
+            className="border border-gray-400 rounded-full px-4 py-2 text-sm bg-white min-w-[150px]"
             value={categoriaFiltro}
             onChange={(e) => setCategoriaFiltro(e.target.value)}
-            >
+          >
             <option value="">Categoría</option>
             {categorias.map((c) => (
-                <option
-                key={c.idCategoria}
-                value={c.idCategoria}
-                >
+              <option key={c.idCategoria} value={c.idCategoria}>
                 {c.nombre}
-                </option>
+              </option>
             ))}
           </select>
 
+          {/* Filtro Estado */}
           <select
-            className="border border-gray-400 rounded-full px-4 py-2 text-sm bg-white"
+            className="border border-gray-400 rounded-full px-4 py-2 text-sm bg-white min-w-[140px]"
             value={estadoFiltro}
             onChange={(e) => setEstadoFiltro(e.target.value)}
-            >
+          >
             <option value="">Estado</option>
             <option value="critico">Crítico</option>
             <option value="minimo">Mínimo</option>
             <option value="ok">Ok</option>
           </select>
-  
-
         </div>
 
+        {/* DERECHA: botón agregar */}
         <div>
           <button
             onClick={openCreateModal}
@@ -343,6 +346,7 @@ export default function ProductosPage() {
           </button>
         </div>
       </div>
+
 
       {/* Tabla */}
       <div className="bg-[#f3ebe7] border border-gray-300 rounded-md overflow-hidden">

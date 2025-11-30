@@ -208,26 +208,28 @@ export default function CategoriasPage() {
 
       {/* Buscador + botón agregar */}
       <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
-        <div className="flex items-center gap-2 flex-1 min-w-[260px]">
-          <div className="flex items-center bg-white border border-gray-400 rounded-full overflow-hidden flex-1">
+        {/* IZQUIERDA: buscador compacto */}
+        <div className="min-w-[260px] max-w-md w-full md:w-auto">
+          <div className="flex items-center bg-white border border-gray-400 rounded-full overflow-hidden">
             <span className="px-3 text-gray-500">
               <FiSearch />
             </span>
             <input
               type="text"
               placeholder="Buscar Categoría..."
-              className="flex-1 px-2 py-2 text-sm outline-none"
+              className="flex-1 px-2 py-2 text-sm outline-none border-none"
               value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
+              onChange={(e) => setSearch(e.target.value)}
             />
+            <button
+              className="px-5 py-2 bg-black text-white text-sm hover:bg-gray-900 transition"
+            >
+              Buscar
+            </button>
           </div>
-          <button className="px-5 py-2 rounded-full bg-black text-white text-sm hover:bg-gray-900 transition">
-            Buscar
-          </button>
         </div>
 
+        {/* DERECHA: botón agregar */}
         <div>
           <button
             onClick={openCreate}

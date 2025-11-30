@@ -54,35 +54,39 @@ const ClientesTable: React.FC<Props> = ({
           <h1 className="text-2xl font-semibold text-gray-800">
             Gestión de Clientes
           </h1>
-          <div className="mt-2 h-[1px] bg-gray-300 w-full" />
         </div>
       </div>
 
-      {/* Barra de búsqueda y filtros */}
-      <div className="flex flex-wrap items-center justify-between mb-5 gap-4">
-        {/* Buscar */}
-        <div className="flex items-center gap-2 flex-1 min-w-[260px]">
-          <div className="flex items-center bg-white border border-gray-400 rounded-full overflow-hidden flex-1">
-            <span className="px-3 text-gray-500">
-              <FiSearch />
-            </span>
-            <input
-              type="text"
-              placeholder="Buscar Clientes..."
-              className="flex-1 px-2 py-2 text-sm outline-none"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+      {/* Barra de búsqueda */}
+      <div className="mb-5">
+        <div className="flex flex-wrap items-center gap-3 justify-start">
+          <div className="flex items-stretch">
+            {/* Input + icono */}
+            <div className="flex items-center bg-white border border-gray-400 rounded-l-full px-3 py-1.5 min-w-[260px]">
+              <span className="text-gray-500 mr-2">
+                <FiSearch />
+              </span>
+              <input
+                type="text"
+                placeholder="Buscar Clientes..."
+                className="flex-1 text-sm outline-none"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleBuscarClick()}
+              />
+            </div>
+
+            {/* Botón Buscar pegado */}
+            <button
+              onClick={handleBuscarClick}
+              className="px-5 py-1.5 rounded-r-full bg-black text-white text-sm hover:bg-gray-900 transition -ml-px"
+            >
+              Buscar
+            </button>
           </div>
-          <button
-            onClick={handleBuscarClick}
-            className="px-5 py-2 rounded-full bg-black text-white text-sm hover:bg-gray-900 transition"
-          >
-            Buscar
-          </button>
         </div>
-        
       </div>
+
 
       {/* Tabla */}
       <div className="bg-[#f3ebe7] border border-gray-300 rounded-md overflow-hidden">

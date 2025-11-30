@@ -67,9 +67,9 @@ const DepartamentosPage: React.FC = () => {
 
     {/* Barra de búsqueda y botón agregar */}
     <div className="flex flex-wrap items-center gap-3 justify-between">
-      {/* Buscador + botón Buscar */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center bg-white border border-gray-300 rounded-full px-3 py-1.5 min-w-[220px] max-w-xs">
+      {/* Input + botón Buscar pegados */}
+      <div className="flex items-stretch">
+        <div className="flex items-center bg-white border border-gray-300 rounded-l-full px-3 py-1.5 min-w-[260px]">
           <FiSearch className="text-gray-500 mr-2" />
           <input
             type="text"
@@ -82,7 +82,7 @@ const DepartamentosPage: React.FC = () => {
         </div>
         <button
           onClick={handleBuscar}
-          className="px-4 py-1.5 rounded-full bg-black text-white text-sm hover:bg-gray-800"
+          className="px-4 py-1.5 rounded-r-full bg-black text-white text-sm hover:bg-gray-800 -ml-px"
         >
           Buscar
         </button>

@@ -220,85 +220,63 @@ export default function MovimientosPage() {
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-wrap items-center gap-3 mb-5">
-        <div className="flex flex-col">
-          <label className="text-xs mb-1">Desde</label>
-          <input
-            type="date"
-            value={fechaInicio}
-            onChange={(e) =>
-              setFechaInicio(e.target.value)
-            }
-            className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white"
-          />
-        </div>
+      <div className="flex flex-wrap items-center gap-4 mb-5">
+        {/* Desde */}
+        <input
+          type="date"
+          placeholder="Desde"
+          value={fechaInicio}
+          onChange={(e) => setFechaInicio(e.target.value)}
+          className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white min-w-[140px]"
+        />
 
-        <div className="flex flex-col">
-          <label className="text-xs mb-1">Hasta</label>
-          <input
-            type="date"
-            value={fechaFin}
-            onChange={(e) =>
-              setFechaFin(e.target.value)
-            }
-            className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white"
-          />
-        </div>
+        {/* Hasta */}
+        <input
+          type="date"
+          placeholder="Hasta"
+          value={fechaFin}
+          onChange={(e) => setFechaFin(e.target.value)}
+          className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white min-w-[140px]"
+        />
 
-        <div className="flex flex-col min-w-[180px]">
-          <label className="text-xs mb-1">
-            Nombre producto...
-          </label>
-          <input
-            value={textoProducto}
-            onChange={(e) =>
-              setTextoProducto(e.target.value)
-            }
-            className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white"
-          />
-        </div>
+        {/* Nombre producto */}
+        <input
+          placeholder="Nombre producto..."
+          value={textoProducto}
+          onChange={(e) => setTextoProducto(e.target.value)}
+          className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white min-w-[180px]"
+        />
 
-        <div className="flex flex-col min-w-[180px]">
-          <label className="text-xs mb-1">
-            Responsable...
-          </label>
-          <input
-            value={textoResponsable}
-            onChange={(e) =>
-              setTextoResponsable(e.target.value)
-            }
-            className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white"
-          />
-        </div>
+        {/* Responsable */}
+        <input
+          placeholder="Responsable..."
+          value={textoResponsable}
+          onChange={(e) => setTextoResponsable(e.target.value)}
+          className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white min-w-[180px]"
+        />
 
-        <div className="flex flex-col">
-          <label className="text-xs mb-1">Tipo</label>
-          <select
-            value={tipo}
-            onChange={(e) =>
-              setTipo(
-                e.target.value as
-                  | ""
-                  | "entrada"
-                  | "salida"
-              )
-            }
-            className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white"
-          >
-            <option value="">Tipo</option>
-            <option value="entrada">Entrada</option>
-            <option value="salida">Salida</option>
-          </select>
-        </div>
+        {/* Tipo */}
+        <select
+          value={tipo}
+          onChange={(e) =>
+            setTipo(e.target.value as "" | "entrada" | "salida")
+          }
+          className="border border-gray-400 rounded-full px-4 py-1.5 text-sm bg-white min-w-[140px]"
+        >
+          <option value="">Tipo</option>
+          <option value="entrada">Entrada</option>
+          <option value="salida">Salida</option>
+        </select>
 
+        {/* Botón aplicar */}
         <button
           onClick={aplicarFiltros}
           className="px-5 py-2 rounded-full bg-black text-white text-sm hover:bg-gray-900 transition"
         >
           Aplicar Filtros
         </button>
-
       </div>
+
 
       {/* Tabla */}
       <div className="bg-[#f3ebe7] border border-gray-300 rounded-md overflow-hidden">

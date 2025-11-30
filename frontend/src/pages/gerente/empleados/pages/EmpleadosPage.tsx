@@ -58,11 +58,57 @@ const EmpleadosPage: React.FC = () => {
   return (
     <div className="w-full space-y-4">
       {/* Título */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-3">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
           Control y administración de empleados
         </h1>
+      </div>
 
+      {/* Barra de búsqueda + filtros + botón agregar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+        {/* Buscar + Departamento (lado izquierdo) */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Input + botón Buscar pegados */}
+          <div className="flex items-stretch">
+            <div className="flex items-center bg-white border border-gray-300 rounded-l-full px-3 py-1.5 min-w-[260px]">
+              <FiSearch className="text-gray-500 mr-2" />
+              <input
+                type="text"
+                placeholder="Buscar Empleado..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleBuscar()}
+                className="flex-1 text-sm outline-none"
+              />
+            </div>
+            <button
+              onClick={handleBuscar}
+              className="px-4 py-1.5 rounded-r-full bg-black text-white text-sm hover:bg-gray-800 -ml-px"
+            >
+              Buscar
+            </button>
+          </div>
+
+          {/* Select de departamento, a la derecha del buscador */}
+          <select
+            value={departamentoFilter === "" ? "" : String(departamentoFilter)}
+            onChange={(e) =>
+              setDepartamentoFilter(
+                e.target.value === "" ? "" : Number(e.target.value)
+              )
+            }
+            className="px-4 py-1.5 rounded-full border border-gray-400 bg-white text-sm min-w-[180px]"
+          >
+            <option value="">Departamento</option>
+            {departamentosOptions.map((d) => (
+              <option key={d.idDepartamento} value={d.idDepartamento}>
+                {d.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Botón Agregar (lado derecho) */}
         <button
           onClick={() => {
             setFormMode("create");
@@ -73,49 +119,6 @@ const EmpleadosPage: React.FC = () => {
         >
           Agregar Empleado
         </button>
-      </div>
-
-      {/* Barra de filtros */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 mb-3">
-        {/* Buscar */}
-        <div className="flex-1 flex items-center gap-2">
-          <div className="flex-1 relative">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Buscar Empleado..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 rounded-full border border-gray-400 bg-white text-sm"
-            />
-          </div>
-          <button
-            onClick={handleBuscar}
-            className="px-4 py-1.5 rounded-full bg-black text-white text-sm hover:bg-gray-800"
-          >
-            Buscar
-          </button>
-        </div>
-
-        {/* Filtro por departamento */}
-        <div className="w-full md:w-60">
-          <select
-            value={departamentoFilter === "" ? "" : String(departamentoFilter)}
-            onChange={(e) =>
-              setDepartamentoFilter(
-                e.target.value === "" ? "" : Number(e.target.value)
-              )
-            }
-            className="w-full px-3 py-1.5 rounded-full border border-gray-400 bg-white text-sm"
-          >
-            <option value="">Departamento</option>
-            {departamentosOptions.map((d) => (
-              <option key={d.idDepartamento} value={d.idDepartamento}>
-                {d.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
       {/* Tabla */}

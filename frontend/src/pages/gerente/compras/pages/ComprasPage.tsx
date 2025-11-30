@@ -71,20 +71,11 @@ const ComprasPage: React.FC = () => {
 
   return (
     <div className="w-full space-y-4">
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      {/* Título */}
+      <div className="mb-3">
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
           Gestión de Compras
         </h1>
-
-        {view === "list" && (
-          <button
-            onClick={() => setView("create")}
-            className="px-4 py-2 rounded-full bg-blue-700 text-white text-sm hover:bg-blue-800"
-          >
-            Agregar Compra
-          </button>
-        )}
       </div>
 
       {view === "create" ? (
@@ -95,52 +86,53 @@ const ComprasPage: React.FC = () => {
         />
       ) : (
         <>
-          {/* Filtros superiores */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-            {/* Buscar */}
-            <div className="flex-1 flex items-center gap-2">
-              <div className="relative flex-1">
-                <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
-                  <FiSearch />
-                </span>
-                <input
-                  type="text"
-                  placeholder="Buscar Compras..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-full border border-gray-400 bg-white text-sm"
-                />
+          {/* Barra de filtros + botón agregar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            {/* LADO IZQUIERDO: buscador + fechas + proveedor + aplicar */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Buscador + botón Buscar pegados */}
+              <div className="flex items-stretch">
+                <div className="flex items-center bg-white border border-gray-300 rounded-l-full px-3 py-1.5 min-w-[260px]">
+                  <FiSearch className="text-gray-500 mr-2" />
+                  <input
+                    type="text"
+                    placeholder="Buscar Compras..."
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && syncAndApplyFilters()}
+                    className="flex-1 text-sm outline-none"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={syncAndApplyFilters}
+                  className="px-4 py-1.5 rounded-r-full bg-black text-white text-sm hover:bg-gray-800 -ml-px"
+                >
+                  Buscar
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={syncAndApplyFilters}
-                className="px-4 py-2 rounded-full bg-black text-white text-sm hover:bg-gray-800"
-              >
-                Buscar
-              </button>
-            </div>
 
-            {/* Fechas + proveedor + aplicar */}
-            <div className="flex flex-wrap items-center gap-2">
+              {/* Fechas */}
               <input
                 type="date"
                 value={desde}
                 onChange={(e) => setDesde(e.target.value)}
-                className="px-3 py-2 rounded-full border border-gray-400 bg-white text-sm min-w-[150px]"
+                className="px-3 py-1.5 rounded-full border border-gray-400 bg-white text-sm min-w-[150px]"
                 placeholder="Desde"
               />
               <input
                 type="date"
                 value={hasta}
                 onChange={(e) => setHasta(e.target.value)}
-                className="px-3 py-2 rounded-full border border-gray-400 bg-white text-sm min-w-[150px]"
+                className="px-3 py-1.5 rounded-full border border-gray-400 bg-white text-sm min-w-[150px]"
                 placeholder="Hasta"
               />
 
+              {/* Proveedor */}
               <select
                 value={proveedorId}
                 onChange={(e) => setProveedorId(e.target.value)}
-                className="px-3 py-2 rounded-full border border-gray-400 bg-white text-sm min-w-[150px]"
+                className="px-3 py-1.5 rounded-full border border-gray-400 bg-white text-sm min-w-[150px]"
               >
                 <option value="">Proveedor</option>
                 {proveedores.map((p) => (
@@ -150,14 +142,23 @@ const ComprasPage: React.FC = () => {
                 ))}
               </select>
 
+              {/* Aplicar filtros */}
               <button
                 type="button"
                 onClick={syncAndApplyFilters}
-                className="px-4 py-2 rounded-full bg-black text-white text-sm hover:bg-gray-800"
+                className="px-4 py-1.5 rounded-full bg-black text-white text-sm hover:bg-gray-800"
               >
-                Aplicar Filtros
+                Aplicar filtros
               </button>
             </div>
+
+            {/* LADO DERECHO: botón Agregar Compra */}
+            <button
+              onClick={() => setView("create")}
+              className="px-4 py-2 rounded-full bg-blue-700 text-white text-sm hover:bg-blue-800"
+            >
+              Agregar Compra
+            </button>
           </div>
 
           {/* Tabla */}
