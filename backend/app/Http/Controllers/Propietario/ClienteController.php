@@ -97,7 +97,7 @@ class ClienteController extends Controller
             $cliente = Cliente::with('persona')->findOrFail($id);
 
             $validator = Validator::make($request->all(),[
-                'ci'=> 'required|string|unique:persona, ci,' . $cliente->persona->idPersona . ',idPersona',
+                'ci'=> 'required|string|unique:persona,ci,' . $cliente->persona->idPersona . ',idPersona',
                 'paterno'=> 'required|string|max:255',
                 'materno'=> 'required|string|max:255',
                 'nombres'=> 'required|string|max:255',
