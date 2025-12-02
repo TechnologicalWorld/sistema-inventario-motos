@@ -10,7 +10,7 @@ import { Unauthorized } from "./pages/auth/Unauthorized";
 // Layout
 import DashboardLayout from "./components/layout/Layout";
 import { Perfil } from "./services/shared/Perfil";
-import DashboardPropietario from "./pages/propietario/dashboard/pages/DashboardPropietario";
+
 // ========================
 // GERENTE - Inventarios
 // ========================
@@ -23,6 +23,11 @@ import ComprasPage from "./pages/gerente/compras/pages/ComprasPage";
 import ProveedoresPage from "./pages/gerente/proveedores/pages/ProveedoresPage";
 import EmpleadosPage from "./pages/gerente/empleados/pages/EmpleadosPage";
 import DepartamentosPage from "./pages/gerente/departamentos/pages/DepartamentosPage";
+
+// ========================
+// PROPIETARIO
+// ========================
+import DashboardPropietario from "./pages/propietario/dashboard/pages/DashboardPropietario";
 import ClientesPagePro from "./pages/propietario/clientes/pages/ClientesPagePro";
 import EmpresaPagePro from "./pages/propietario/empresa/pages/EmpresaPagePro";
 import ProveedoresPagePro from "./pages/propietario/proveedores/pages/ProveedoresPagePro";
@@ -40,12 +45,6 @@ const GerenteDashboard = () => (
 const EmpleadoDashboard = () => (
   <div className="p-4">
     <h1 className="text-xl font-semibold">Dashboard EMPLEADO</h1>
-  </div>
-);
-
-const PropietarioDashboard = () => (
-  <div className="p-4">
-    <h1 className="text-xl font-semibold">Dashboard PROPIETARIO</h1>
   </div>
 );
 

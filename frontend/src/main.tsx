@@ -8,7 +8,7 @@ import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter> {/* ✅ Envuelve toda la app con BrowserRouter */}
+    <BrowserRouter> 
       <AuthProvider>
         <App />
       </AuthProvider>
