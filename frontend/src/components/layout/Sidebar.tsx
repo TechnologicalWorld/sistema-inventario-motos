@@ -368,12 +368,7 @@ const empleadoMenu: MenuItem[] = [
     icon: <FiUsers className="text-lg" />,
     to: "/empleado/clientes",
   },
-  {
-    id: "emp-compras",
-    label: "Compras",
-    icon: <FiShoppingBag className="text-lg" />,
-    to: "/empleado/compras",
-  },
+  
   {
     id: "emp-movimientos",
     label: "Movimientos",
@@ -384,7 +379,7 @@ const empleadoMenu: MenuItem[] = [
     id: "emp-departamento",
     label: "Departamento",
     icon: <FiBriefcase className="text-lg" />,
-    to: "/empleado/departamento",
+    to: "/empleado/mi-departamento",
   },
 ];
 

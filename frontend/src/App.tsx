@@ -26,6 +26,25 @@ import DepartamentosPage from "./pages/gerente/departamentos/pages/Departamentos
 import ClientesPagePro from "./pages/propietario/clientes/pages/ClientesPagePro";
 import EmpresaPagePro from "./pages/propietario/empresa/pages/EmpresaPagePro";
 import ProveedoresPagePro from "./pages/propietario/proveedores/pages/ProveedoresPagePro";
+
+
+
+
+// ========================
+// EMPLEADO
+// ========================
+
+import EmpleadoClientesPage from "./pages/empleado/clientes/pages/ClientesPage";
+import EmpleadoInventarioPage from "./pages/empleado/inventario/pages/InventarioPage";
+import EmpleadoVentaPage from "./pages/empleado/ventas/pages/VentasPage";
+import EmpleadoMovimientosPage from "./pages/empleado/movimientos/pages/MovimientosPage";
+
+import MiDepartamentoPage from "./pages/empleado/departamentos/pages/MiDepartamentoPage";
+
+
+
+
+
 /**
  * Dashboards temporales por rol
  */
@@ -129,6 +148,17 @@ function App() {
         {/* Prefix: /empleado/...          */}
         {/* ============================== */}
         <Route path="empleado/dashboard" element={<EmpleadoDashboard />} />
+
+        <Route path="empleado/clientes" element={<EmpleadoClientesPage />} />
+        <Route path="empleado/inventario" element={<EmpleadoInventarioPage />} />
+        <Route path="empleado/ventas" element={<EmpleadoVentaPage />} />
+        <Route path="empleado/movimientos" element={<EmpleadoMovimientosPage />} />
+        <Route path="empleado/mi-departamento" element={<MiDepartamentoPage />} />
+        
+        
+
+
+
 
         {/* ============================== */}
         {/* RUTAS PARA ROL: PROPIETARIO    */}
