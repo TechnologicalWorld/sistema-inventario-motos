@@ -23,9 +23,15 @@ import ComprasPage from "./pages/gerente/compras/pages/ComprasPage";
 import ProveedoresPage from "./pages/gerente/proveedores/pages/ProveedoresPage";
 import EmpleadosPage from "./pages/gerente/empleados/pages/EmpleadosPage";
 import DepartamentosPage from "./pages/gerente/departamentos/pages/DepartamentosPage";
+
+// ========================
+// PROPIETARIO
+// ========================
+import DashboardPropietario from "./pages/propietario/dashboard/pages/DashboardPropietario";
 import ClientesPagePro from "./pages/propietario/clientes/pages/ClientesPagePro";
 import EmpresaPagePro from "./pages/propietario/empresa/pages/EmpresaPagePro";
 import ProveedoresPagePro from "./pages/propietario/proveedores/pages/ProveedoresPagePro";
+<<<<<<< HEAD
 
 
 
@@ -45,6 +51,10 @@ import MiDepartamentoPage from "./pages/empleado/departamentos/pages/MiDepartame
 
 
 
+=======
+import ComprasPagePro from "./pages/propietario/compras/pages/ComprasPagePro";
+import VentasPagePro from "./pages/propietario/ventas/pages/VentasPagePro";
+>>>>>>> b14e233d7fd2965735bb145a546165113e09007e
 /**
  * Dashboards temporales por rol
  */
@@ -57,12 +67,6 @@ const GerenteDashboard = () => (
 const EmpleadoDashboard = () => (
   <div className="p-4">
     <h1 className="text-xl font-semibold">Dashboard EMPLEADO</h1>
-  </div>
-);
-
-const PropietarioDashboard = () => (
-  <div className="p-4">
-    <h1 className="text-xl font-semibold">Dashboard PROPIETARIO</h1>
   </div>
 );
 
@@ -164,10 +168,12 @@ function App() {
         {/* RUTAS PARA ROL: PROPIETARIO    */}
         {/* Prefix: /propietario/...       */}
         {/* ============================== */}
-        <Route path="propietario/dashboard" element={<PropietarioDashboard />}/>
+        <Route path="propietario/dashboard" element={<DashboardPropietario />}/>
         <Route path="propietario/empresa" element={<EmpresaPagePro />}/>
         <Route path="propietario/proveedores" element={<ProveedoresPagePro/>}/>
         <Route path="propietario/clientes" element={<ClientesPagePro/>}/>
+        <Route path="propietario/compras" element={<ComprasPagePro/>}/>
+        <Route path="propietario/ventas" element={<VentasPagePro/>}/>
         {/* ===================================================== */}
         {/* Ruta por defecto dentro del layout protegido          */}
         {/* Si entras a /gerente, /empleado, etc sin path final,  */}

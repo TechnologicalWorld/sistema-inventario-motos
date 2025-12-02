@@ -74,28 +74,34 @@ class CompraController extends Controller
                 ], 401);
             }
 
-            // Obtener el gerente autenticado - DIFERENTES OPCIONES
+            $gerente = null;
+            
             $gerente = Gerente::find($user->idUsuario);
             
-            // Si no funciona por email, intentar por idUsuario
             if (!$gerente) {
-                return response()->json([
-                                'success' => false,
-                                'error' => 'Usuario no es un gerente válido'
-                            ], 403);
+                $gerente = Gerente::where('email', $user->email)->first();
             }
             
-            // Si aún no encontramos el gerente, buscar por relación con persona
             if (!$gerente) {
                 $gerente = Gerente::whereHas('persona', function($query) use ($user) {
                     $query->where('idPersona', $user->idUsuario);
                 })->first();
             }
 
+            if (!$gerente && isset($user->idGerente)) {
+                $gerente = Gerente::find($user->idGerente);
+            }
+
             if (!$gerente) {
+                DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'error' => 'Usuario no es un gerente válido. ID Usuario: ' . $user->idUsuario
+                    'error' => 'Usuario no es un gerente válido',
+                    'debug' => [
+                        'idUsuario' => $user->idUsuario,
+                        'email' => $user->email,
+                        'user_data' => $user
+                    ]
                 ], 403);
             }
 
@@ -153,7 +159,8 @@ class CompraController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Error al registrar compra',
-                'details' => $e->getMessage()
+                'details' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ], 500);
         }
     }
