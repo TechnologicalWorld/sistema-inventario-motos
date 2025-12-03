@@ -5,7 +5,7 @@ import {
   FiChevronRight,
   FiEye,
   FiPackage,
-  FiAlertTriangle
+  FiAlertTriangle,
 } from "react-icons/fi";
 import { Producto } from "../service/empleado.inventario.service";
 
@@ -38,66 +38,52 @@ const ProductosTable: React.FC<Props> = ({
   onChangePage,
   onVerDetalle,
 }) => {
-  const handleBuscarClick = () => {
-    onSearch();
-  };
+  const handleBuscarClick = () => onSearch();
 
   const toggleFiltroStockBajo = () => {
     setFiltroStockBajo(!filtroStockBajo);
   };
 
   return (
-    <div className="w-full">
-      {/* Header título */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-800">
-            Inventario - Productos
-          </h1>
-          <p className="text-gray-600 text-sm">Consulta de productos en stock</p>
+    <div className="w-full space-y-4">
+      {/* Barra de búsqueda y filtros (igual patrón que GERENTE) */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Buscador a la izquierda */}
+        <div className="flex items-stretch">
+          <div className="flex items-center bg-white border border-gray-400 rounded-l-full px-3 py-1.5 min-w-[260px]">
+            <span className="text-gray-500 mr-2">
+              <FiSearch />
+            </span>
+            <input
+              type="text"
+              placeholder="Buscar productos..."
+              className="flex-1 text-sm outline-none"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleBuscarClick()}
+            />
+          </div>
+          <button
+            onClick={handleBuscarClick}
+            className="px-5 py-1.5 rounded-r-full bg-black text-white text-sm hover:bg-gray-900 transition -ml-px"
+          >
+            Buscar
+          </button>
         </div>
-      </div>
 
-      {/* Barra de búsqueda y filtros */}
-      <div className="mb-5">
-        <div className="flex flex-wrap items-center gap-3 justify-between">
-          {/* Búsqueda */}
-          <div className="flex items-stretch">
-            <div className="flex items-center bg-white border border-gray-400 rounded-l-full px-3 py-1.5 min-w-[260px]">
-              <span className="text-gray-500 mr-2">
-                <FiSearch />
-              </span>
-              <input
-                type="text"
-                placeholder="Buscar productos..."
-                className="flex-1 text-sm outline-none"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleBuscarClick()}
-              />
-            </div>
-            <button
-              onClick={handleBuscarClick}
-              className="px-5 py-1.5 rounded-r-full bg-black text-white text-sm hover:bg-gray-900 transition -ml-px"
-            >
-              Buscar
-            </button>
-          </div>
-
-          {/* Filtros */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleFiltroStockBajo}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-colors ${
-                filtroStockBajo
-                  ? "bg-red-100 text-red-700 border-red-300"
-                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              <FiAlertTriangle />
-              Stock Bajo
-            </button>
-          </div>
+        {/* Filtros a la derecha */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleFiltroStockBajo}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-colors ${
+              filtroStockBajo
+                ? "bg-red-100 text-red-700 border-red-300"
+                : "bg-white text-gray-800 border-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            <FiAlertTriangle />
+            Stock bajo
+          </button>
         </div>
       </div>
 
@@ -109,7 +95,7 @@ const ProductosTable: React.FC<Props> = ({
               <th className="px-4 py-2 font-semibold">Código</th>
               <th className="px-4 py-2 font-semibold">Producto</th>
               <th className="px-4 py-2 font-semibold">Categoría</th>
-              <th className="px-4 py-2 font-semibold">Precio Venta</th>
+              <th className="px-4 py-2 font-semibold">Precio venta</th>
               <th className="px-4 py-2 font-semibold">Stock</th>
               <th className="px-4 py-2 font-semibold">Estado</th>
               <th className="px-4 py-2 font-semibold">Acciones</th>
@@ -120,7 +106,7 @@ const ProductosTable: React.FC<Props> = ({
               <tr>
                 <td colSpan={7} className="text-center py-6 text-gray-600">
                   <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
                     Cargando productos...
                   </div>
                 </td>
@@ -152,37 +138,46 @@ const ProductosTable: React.FC<Props> = ({
             {!loading &&
               !error &&
               productos.map((producto, idx) => {
-                const tieneStockBajo = producto.stock <= producto.stockMinimo;
-                
+                const tieneStockBajo =
+                  producto.stock <= producto.stockMinimo;
+
                 return (
                   <tr
                     key={producto.idProducto}
-                    className={idx % 2 === 0 ? "bg-[#f8f2ee]" : "bg-[#efe4dd]"}
+                    className={
+                      idx % 2 === 0 ? "bg-[#f8f2ee]" : "bg-[#efe4dd]"
+                    }
                   >
                     <td className="px-4 py-2 font-mono text-gray-700">
                       {producto.codigoProducto}
                     </td>
                     <td className="px-4 py-2">
                       <div>
-                        <div className="font-medium text-gray-800">{producto.nombre}</div>
+                        <div className="font-medium text-gray-800">
+                          {producto.nombre}
+                        </div>
                         {producto.descripcion && (
-                          <div className="text-xs text-gray-600 truncate max-w-[200px]">
+                          <div className="text-xs text-gray-600 truncate max-w-[220px]">
                             {producto.descripcion}
                           </div>
                         )}
                       </div>
                     </td>
                     <td className="px-4 py-2">
-                      {producto.categoria?.nombre || '—'}
+                      {producto.categoria?.nombre || "—"}
                     </td>
-                    <td className="px-4 py-2 font-semibold text-green-600">
+                    <td className="px-4 py-2 font-semibold text-green-700">
                       Bs. {Number(producto.precioVenta).toFixed(2)}
                     </td>
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-2">
-                        <span className={`font-semibold ${
-                          tieneStockBajo ? 'text-red-600' : 'text-gray-800'
-                        }`}>
+                        <span
+                          className={`font-semibold ${
+                            tieneStockBajo
+                              ? "text-red-600"
+                              : "text-gray-900"
+                          }`}
+                        >
                           {producto.stock}
                         </span>
                         {tieneStockBajo && (
@@ -191,19 +186,23 @@ const ProductosTable: React.FC<Props> = ({
                       </div>
                     </td>
                     <td className="px-4 py-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        producto.estado === 'activo' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {producto.estado === 'activo' ? 'Activo' : 'Inactivo'}
+                      <span
+                        className={`px-2 py-1 rounded-full text-[11px] font-semibold ${
+                          producto.estado === "activo"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {producto.estado === "activo"
+                          ? "Activo"
+                          : "Inactivo"}
                       </span>
                     </td>
                     <td className="px-4 py-2">
                       <div className="flex items-center justify-center">
                         <button
                           onClick={() => onVerDetalle(producto)}
-                          className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs hover:bg-blue-700 transition-colors"
+                          className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs hover:bg-indigo-700 transition-colors"
                           title="Ver detalle"
                         >
                           <FiEye />
@@ -218,7 +217,7 @@ const ProductosTable: React.FC<Props> = ({
       </div>
 
       {/* Paginación */}
-      <div className="mt-5 flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center gap-4 mt-4">
         <button
           disabled={page <= 1}
           onClick={() => onChangePage(page - 1)}

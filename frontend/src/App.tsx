@@ -31,30 +31,18 @@ import DashboardPropietario from "./pages/propietario/dashboard/pages/DashboardP
 import ClientesPagePro from "./pages/propietario/clientes/pages/ClientesPagePro";
 import EmpresaPagePro from "./pages/propietario/empresa/pages/EmpresaPagePro";
 import ProveedoresPagePro from "./pages/propietario/proveedores/pages/ProveedoresPagePro";
-<<<<<<< HEAD
-
-
-
+import ComprasPagePro from "./pages/propietario/compras/pages/ComprasPagePro";
+import VentasPagePro from "./pages/propietario/ventas/pages/VentasPagePro";
 
 // ========================
 // EMPLEADO
 // ========================
-
 import EmpleadoClientesPage from "./pages/empleado/clientes/pages/ClientesPage";
 import EmpleadoInventarioPage from "./pages/empleado/inventario/pages/InventarioPage";
 import EmpleadoVentaPage from "./pages/empleado/ventas/pages/VentasPage";
 import EmpleadoMovimientosPage from "./pages/empleado/movimientos/pages/MovimientosPage";
-
 import MiDepartamentoPage from "./pages/empleado/departamentos/pages/MiDepartamentoPage";
 
-
-
-
-
-=======
-import ComprasPagePro from "./pages/propietario/compras/pages/ComprasPagePro";
-import VentasPagePro from "./pages/propietario/ventas/pages/VentasPagePro";
->>>>>>> b14e233d7fd2965735bb145a546165113e09007e
 /**
  * Dashboards temporales por rol
  */

@@ -1,3 +1,4 @@
+// src/pages/empleado/movimientos/components/MovimientosTable.tsx
 import React from "react";
 import {
   FiChevronLeft,
@@ -5,10 +6,9 @@ import {
   FiEye,
   FiPlus,
   FiTrendingUp,
-  FiTrendingDown
+  FiTrendingDown,
 } from "react-icons/fi";
 import { Movimiento } from "../services/empleado.movimientos.service";
-import { useNavigate } from "react-router-dom";
 
 interface Props {
   movimientos: Movimiento[];
@@ -44,52 +44,52 @@ const MovimientosTable: React.FC<Props> = ({
   onVerDetalle,
   onAgregarMovimiento,
 }) => {
-  const navigate = useNavigate();
+  const movimientosArray = Array.isArray(movimientos) ? movimientos : [];
 
   return (
-    <div className="w-full">
-      {/* Header con estadísticas */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div className="w-full space-y-4">
+      {/* Header título + botón */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-800">
-            Movimientos de Inventario
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
+            Movimientos de inventario
           </h1>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-sm text-gray-600">
             Total: {total} movimientos registrados
           </p>
         </div>
-        
+
         <button
           onClick={onAgregarMovimiento}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+          className="flex items-center gap-2 px-4 py-2 rounded-sm text-sm bg-black text-white hover:bg-gray-900"
         >
           <FiPlus />
-          Agregar Movimiento
+          Agregar movimiento
         </button>
       </div>
 
       {/* Tabla */}
-      <div className="bg-white border border-gray-300 rounded-lg overflow-hidden shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-100 border-b">
+      <div className="bg-[#f3ebe7] border border-gray-300 rounded-md overflow-hidden">
+        <table className="w-full text-xs md:text-sm">
+          <thead className="bg-gray-300">
             <tr className="text-left">
-              <th className="px-4 py-3 font-semibold">ID</th>
-              <th className="px-4 py-3 font-semibold">Fecha y Hora</th>
-              <th className="px-4 py-3 font-semibold">Producto</th>
-              <th className="px-4 py-3 font-semibold">Código</th>
-              <th className="px-4 py-3 font-semibold">Tipo</th>
-              <th className="px-4 py-3 font-semibold">Cantidad</th>
-              <th className="px-4 py-3 font-semibold">Stock Actual</th>
-              <th className="px-4 py-3 font-semibold">Acciones</th>
+              <th className="px-4 py-2 font-semibold">ID</th>
+              <th className="px-4 py-2 font-semibold">Fecha y hora</th>
+              <th className="px-4 py-2 font-semibold">Producto</th>
+              <th className="px-4 py-2 font-semibold">Código</th>
+              <th className="px-4 py-2 font-semibold">Tipo</th>
+              <th className="px-4 py-2 font-semibold">Cantidad</th>
+              <th className="px-4 py-2 font-semibold">Stock actual</th>
+              <th className="px-4 py-2 font-semibold">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {loading && movimientos.length === 0 && (
+            {loading && movimientosArray.length === 0 && (
               <tr>
-                <td colSpan={8} className="text-center py-8">
-                  <div className="flex flex-col items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <p className="mt-2 text-gray-600">Cargando movimientos...</p>
+                <td colSpan={8} className="text-center py-8 text-gray-700">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
+                    <p>Cargando movimientos...</p>
                   </div>
                 </td>
               </tr>
@@ -97,75 +97,82 @@ const MovimientosTable: React.FC<Props> = ({
 
             {!loading && error && (
               <tr>
-                <td colSpan={8} className="text-center py-8 text-red-600">
+                <td colSpan={8} className="text-center py-8 text-red-700">
                   {error}
                 </td>
               </tr>
             )}
 
-            {!loading && !error && movimientos.length === 0 && (
+            {!loading && !error && movimientosArray.length === 0 && (
               <tr>
-                <td colSpan={8} className="text-center py-8 text-gray-500">
-                  No se encontraron movimientos
+                <td colSpan={8} className="text-center py-8 text-gray-600">
+                  No se encontraron movimientos.
                 </td>
               </tr>
             )}
 
             {!loading &&
               !error &&
-              movimientos.map((movimiento, idx) => (
+              movimientosArray.map((movimiento, idx) => (
                 <tr
                   key={movimiento.idMovimiento}
-                  className={`border-b hover:bg-gray-50 ${
-                    idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                  }`}
+                  className={
+                    idx % 2 === 0 ? "bg-[#f8f2ee]" : "bg-[#efe4dd]"
+                  }
                 >
-                  <td className="px-4 py-3">
-                    <span className="font-mono text-gray-700">
+                  <td className="px-4 py-2">
+                    <span className="font-mono text-gray-800">
                       M-{movimiento.idMovimiento.toString().padStart(4, "0")}
                     </span>
                   </td>
-                  
-                  <td className="px-4 py-3">
+
+                  <td className="px-4 py-2">
                     <div className="flex flex-col">
-                      <span className="font-medium">
+                      <span className="font-medium text-gray-900">
                         {formatFecha(movimiento.fechaMovimiento)}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {new Date(movimiento.created_at).toLocaleDateString()}
+                      <span className="text-[11px] text-gray-600">
+                        Reg.:{" "}
+                        {new Date(
+                          movimiento.created_at
+                        ).toLocaleDateString()}
                       </span>
                     </div>
                   </td>
-                  
-                  <td className="px-4 py-3">
+
+                  <td className="px-4 py-2">
                     <div>
-                      <span className="font-medium">{movimiento.producto.nombre}</span>
-                      <p className="text-xs text-gray-600 truncate max-w-xs">
-                        {movimiento.producto.descripcion}
-                      </p>
+                      <span className="font-medium text-gray-900">
+                        {movimiento.producto.nombre}
+                      </span>
+                      {movimiento.producto.descripcion && (
+                        <p className="text-[11px] text-gray-700 truncate max-w-xs">
+                          {movimiento.producto.descripcion}
+                        </p>
+                      )}
                     </div>
                   </td>
-                  
-                  <td className="px-4 py-3">
-                    <span className="font-mono text-gray-700">
+
+                  <td className="px-4 py-2">
+                    <span className="font-mono text-gray-800">
                       {movimiento.producto.codigoProducto}
                     </span>
                   </td>
-                  
-                  <td className="px-4 py-3">
+
+                  <td className="px-4 py-2">
                     <div className="flex items-center gap-2">
                       {movimiento.tipo === "entrada" ? (
                         <>
-                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                          <span className="text-green-700 font-medium flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-green-600" />
+                          <span className="text-green-800 font-medium flex items-center gap-1">
                             <FiTrendingUp size={12} />
                             Entrada
                           </span>
                         </>
                       ) : (
                         <>
-                          <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                          <span className="text-red-700 font-medium flex items-center gap-1">
+                          <div className="w-2 h-2 rounded-full bg-red-600" />
+                          <span className="text-red-800 font-medium flex items-center gap-1">
                             <FiTrendingDown size={12} />
                             Salida
                           </span>
@@ -173,34 +180,41 @@ const MovimientosTable: React.FC<Props> = ({
                       )}
                     </div>
                   </td>
-                  
-                  <td className="px-4 py-3">
-                    <span className={`font-bold ${
-                      movimiento.tipo === "entrada" ? "text-green-700" : "text-red-700"
-                    }`}>
-                      {movimiento.tipo === "entrada" ? "+" : "-"}{movimiento.cantidad}
+
+                  <td className="px-4 py-2">
+                    <span
+                      className={`font-bold ${
+                        movimiento.tipo === "entrada"
+                          ? "text-green-800"
+                          : "text-red-800"
+                      }`}
+                    >
+                      {movimiento.tipo === "entrada" ? "+" : "-"}
+                      {movimiento.cantidad}
                     </span>
                   </td>
-                  
-                  <td className="px-4 py-3">
-                    <div className="flex items-center">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        movimiento.producto.stock <= movimiento.producto.stockMinimo
+
+                  <td className="px-4 py-2">
+                    <span
+                      className={`px-2 py-1 rounded-full text-[11px] font-medium ${
+                        movimiento.producto.stock <=
+                        movimiento.producto.stockMinimo
                           ? "bg-red-100 text-red-800"
-                          : movimiento.producto.stock <= movimiento.producto.stockMinimo * 2
+                          : movimiento.producto.stock <=
+                            movimiento.producto.stockMinimo * 2
                           ? "bg-yellow-100 text-yellow-800"
                           : "bg-green-100 text-green-800"
-                      }`}>
-                        {movimiento.producto.stock} unidades
-                      </span>
-                    </div>
+                      }`}
+                    >
+                      {movimiento.producto.stock} unidades
+                    </span>
                   </td>
-                  
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-2">
+
+                  <td className="px-4 py-2">
+                    <div className="flex items-center justify-center">
                       <button
                         onClick={() => onVerDetalle(movimiento)}
-                        className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs hover:bg-blue-700 transition-colors"
+                        className="w-8 h-8 rounded-full bg-indigo-700 text-white flex items-center justify-center text-xs hover:bg-indigo-800"
                         title="Ver detalle del movimiento"
                       >
                         <FiEye />
@@ -214,86 +228,43 @@ const MovimientosTable: React.FC<Props> = ({
       </div>
 
       {/* Paginación */}
-      {!loading && movimientos.length > 0 && (
-        <div className="mt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-sm text-gray-600">
-            Mostrando página {page} de {lastPage} - Total {total} movimientos
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <button
-              disabled={page <= 1}
-              onClick={() => onCambiarPagina(page - 1)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md border text-sm transition-colors ${
-                page <= 1
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-300"
-                  : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 hover:border-gray-400"
-              }`}
-            >
-              <FiChevronLeft />
-              <span>Anterior</span>
-            </button>
+      {!loading && movimientosArray.length > 0 && (
+        <div className="mt-5 flex items-center justify-center gap-4">
+          {/* Botón Anterior */}
+          <button
+            disabled={page <= 1}
+            onClick={() => onCambiarPagina(page - 1)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm ${
+              page <= 1
+                ? "bg-[#E5E7EB] text-gray-400 border-gray-300 cursor-not-allowed"
+                : "bg-[#E9EDF5] text-[#334155] border-[#CBD5E1] hover:bg-[#dde4f2]"
+            }`}
+          >
+            <FiChevronLeft className="text-sm" />
+            <span>Anterior</span>
+          </button>
 
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(5, lastPage) }, (_, i) => {
-                let pageNum;
-                if (lastPage <= 5) {
-                  pageNum = i + 1;
-                } else if (page <= 3) {
-                  pageNum = i + 1;
-                } else if (page >= lastPage - 2) {
-                  pageNum = lastPage - 4 + i;
-                } else {
-                  pageNum = page - 2 + i;
-                }
-                
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => onCambiarPagina(pageNum)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-md text-sm ${
-                      page === pageNum
-                        ? "bg-blue-600 text-white"
-                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-              
-              {lastPage > 5 && page < lastPage - 2 && (
-                <>
-                  <span className="px-2 text-gray-400">...</span>
-                  <button
-                    onClick={() => onCambiarPagina(lastPage)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-md text-sm ${
-                      page === lastPage
-                        ? "bg-blue-600 text-white"
-                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    {lastPage}
-                  </button>
-                </>
-              )}
-            </div>
+          {/* Texto central */}
+          <span className="text-sm text-gray-700">
+            Página {page} de {lastPage}
+          </span>
 
-            <button
-              disabled={page >= lastPage}
-              onClick={() => onCambiarPagina(page + 1)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md border text-sm transition-colors ${
-                page >= lastPage
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-300"
-                  : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 hover:border-gray-400"
-              }`}
-            >
-              <span>Siguiente</span>
-              <FiChevronRight />
-            </button>
-          </div>
+          {/* Botón Siguiente */}
+          <button
+            disabled={page >= lastPage}
+            onClick={() => onCambiarPagina(page + 1)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm ${
+              page >= lastPage
+                ? "bg-[#E5E7EB] text-gray-400 border-gray-300 cursor-not-allowed"
+                : "bg-[#E9EDF5] text-[#334155] border-[#CBD5E1] hover:bg-[#dde4f2]"
+            }`}
+          >
+            <span>Siguiente</span>
+            <FiChevronRight className="text-sm" />
+          </button>
         </div>
       )}
+
     </div>
   );
 };

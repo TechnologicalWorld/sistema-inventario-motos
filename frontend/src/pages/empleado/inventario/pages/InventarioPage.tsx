@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useInventarioList } from "../hooks/useInventarioList";
 import { Producto } from "../service/empleado.inventario.service";
 import ProductosTable from "../components/ProductosTable";
@@ -19,7 +19,8 @@ const InventarioPage: React.FC = () => {
     setPage,
   } = useInventarioList();
 
-  const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null);
+  const [productoSeleccionado, setProductoSeleccionado] =
+    useState<Producto | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleSearch = () => {
@@ -37,13 +38,24 @@ const InventarioPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  // Efecto para recargar cuando cambia el filtro de stock bajo
-  React.useEffect(() => {
+  // recargar cuando cambia filtro de stock bajo
+  useEffect(() => {
     loadProductos(1, search, filtroStockBajo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtroStockBajo]);
 
   return (
-    <div className="p-6">
+    <div className="w-full space-y-4">
+      {/* Título estilo gerente */}
+      <div className="mb-2">
+        <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
+          Inventario de productos
+        </h1>
+        <p className="text-sm text-gray-600">
+          Consulta rápida del stock disponible para el empleado.
+        </p>
+      </div>
+
       <ProductosTable
         productos={productos}
         loading={loading}

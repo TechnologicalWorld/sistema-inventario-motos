@@ -13,7 +13,7 @@ const MovimientosPage: React.FC = () => {
   const [movimientoSeleccionado, setMovimientoSeleccionado] = useState<Movimiento | null>(null);
   const [modalDetalleOpen, setModalDetalleOpen] = useState(false);
   const [modalAgregarOpen, setModalAgregarOpen] = useState(false);
-
+  
   // Usar el hook
   let hookResult;
   try {
@@ -60,10 +60,18 @@ const MovimientosPage: React.FC = () => {
     setModalDetalleOpen(true);
   };
 
-  const handleRegistrarMovimiento = async (movimientoData: any): Promise<boolean> => {
+  const handleRegistrarMovimiento = async (
+    movimientoData: any
+  ): Promise<boolean> => {
     console.log("➕ Registrando movimiento:", movimientoData);
-    return await crearMovimiento(movimientoData);
+    const ok = await crearMovimiento(movimientoData);
+    if (ok) {
+      // refrescar lista en la página actual
+      loadMovimientos(page);
+    }
+    return ok;
   };
+
 
   // Render
   console.log("🎨 Renderizando MovimientosPage:", {

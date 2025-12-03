@@ -1,30 +1,34 @@
+// src/pages/empleado/ventas/pages/VentasPage.tsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useVentasList } from "../hooks/useVentasList";
 import { Venta } from "../services/empleado.ventas.service";
 import VentasTable from "../components/VentasTable";
 import VentaDetalleModal from "../components/VentaDetalleModal";
 import RegistrarVentaModal from "../components/RegistrarVentaModal";
+import { FiUsers, FiShoppingCart } from "react-icons/fi";
 
 const VentasPage: React.FC = () => {
-  console.log("🚀 VentasPage - Iniciando render");
-  
-  // Estado para modales
+  // Estado modales
   const [ventaSeleccionada, setVentaSeleccionada] = useState<Venta | null>(null);
   const [modalDetalleOpen, setModalDetalleOpen] = useState(false);
   const [modalRegistrarOpen, setModalRegistrarOpen] = useState(false);
 
-  // Usar el hook - CON TRY/CATCH
+  const navigate = useNavigate();
+
   let hookResult;
   try {
     hookResult = useVentasList();
-    console.log("✅ Hook cargado correctamente");
   } catch (error) {
-    console.error("❌ Error al cargar hook:", error);
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h2 className="text-xl font-bold text-red-800 mb-2">Error de carga</h2>
-          <p className="text-red-700">No se pudo cargar el módulo de ventas.</p>
+          <h2 className="text-xl font-bold text-red-800 mb-2">
+            Error de carga
+          </h2>
+          <p className="text-red-700">
+            No se pudo cargar el módulo de ventas.
+          </p>
           <p className="text-red-600 text-sm mt-2">
             Error: {error instanceof Error ? error.message : "Desconocido"}
           </p>
@@ -33,7 +37,6 @@ const VentasPage: React.FC = () => {
     );
   }
 
-  // Desestructurar después de verificar que no hay error
   const {
     ventas,
     loading,
@@ -47,9 +50,7 @@ const VentasPage: React.FC = () => {
     crearVenta,
   } = hookResult;
 
-  // HANDLERS
   const handleSearch = () => {
-    console.log("🔍 Buscando:", search);
     loadVentas(1, search);
   };
 
@@ -60,89 +61,96 @@ const VentasPage: React.FC = () => {
   };
 
   const handleVerDetalle = (venta: Venta) => {
-    console.log("👁️ Ver detalle venta:", venta.idVenta);
     setVentaSeleccionada(venta);
     setModalDetalleOpen(true);
   };
 
   const handleRegistrarVenta = async (ventaData: any): Promise<boolean> => {
-    console.log("➕ Registrando venta:", ventaData);
-    return await crearVenta(ventaData);
+    const ok = await crearVenta(ventaData);
+    if (ok) {
+      // refrescar list
+      loadVentas(page, search);
+    }
+    return ok;
   };
 
-  // RENDER
-  console.log("🎨 Renderizando VentasPage:", {
-    ventasCount: ventas?.length || 0,
-    loading,
-    error,
-    page,
-    lastPage
-  });
+  const irAClientes = () => {
+    navigate("/empleado/clientes");
+  };
 
   return (
-    <div className="p-6">
-      {/* Mostrar error si existe */}
+    <div className="w-full space-y-4">
+      {/* HEADER PÁGINA */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
+            Gestión de ventas
+          </h1>
+          <p className="text-sm text-gray-600">
+            Revisa el historial de ventas y registra nuevas operaciones.
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={irAClientes}
+            className="flex items-center gap-2 px-4 py-2 rounded-sm text-sm bg-white border border-gray-500 text-gray-900 hover:bg-gray-100"
+          >
+            <FiUsers />
+            Agregar cliente
+          </button>
+          <button
+            onClick={() => setModalRegistrarOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-sm text-sm bg-black text-white hover:bg-gray-900"
+          >
+            <FiShoppingCart />
+            Registrar venta
+          </button>
+        </div>
+      </div>
+
+      {/* ERROR GENERAL */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex justify-between items-center">
-            <p className="text-red-700">{error}</p>
-            <button
-              onClick={() => loadVentas(1, search)}
-              className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
-            >
-              Reintentar
-            </button>
-          </div>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 flex justify-between items-center">
+          <span>{error}</span>
+          <button
+            onClick={() => loadVentas(1, search)}
+            className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+          >
+            Reintentar
+          </button>
         </div>
       )}
 
-      {/* Mostrar loading */}
-      {loading && ventas.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando ventas...</p>
-        </div>
-      ) : (
-        <>
-          {/* Tabla principal */}
-          <VentasTable
-            ventas={ventas || []}
-            loading={loading}
-            error={error}
-            page={page}
-            lastPage={lastPage}
-            search={search}
-            setSearch={setSearch}
-            onSearch={handleSearch}
-            onChangePage={handleChangePage}
-            onVerDetalle={handleVerDetalle}
-            onRegistrarVenta={() => {
-              console.log("📝 Abriendo modal registrar venta");
-              setModalRegistrarOpen(true);
-            }}
-          />
+      {/* TABLA / CONTENIDO */}
+      <VentasTable
+        ventas={ventas || []}
+        loading={loading}
+        error={error}
+        page={page}
+        lastPage={lastPage}
+        search={search}
+        setSearch={setSearch}
+        onSearch={handleSearch}
+        onChangePage={handleChangePage}
+        onVerDetalle={handleVerDetalle}
+      />
 
-          {/* Modales */}
-          <VentaDetalleModal
-            venta={ventaSeleccionada}
-            open={modalDetalleOpen}
-            onClose={() => {
-              console.log("❌ Cerrando modal detalle");
-              setModalDetalleOpen(false);
-              setVentaSeleccionada(null);
-            }}
-          />
+      {/* MODALES */}
+      <VentaDetalleModal
+        venta={ventaSeleccionada}
+        open={modalDetalleOpen}
+        onClose={() => {
+          setModalDetalleOpen(false);
+          setVentaSeleccionada(null);
+        }}
+      />
 
-          <RegistrarVentaModal
-            open={modalRegistrarOpen}
-            onClose={() => {
-              console.log("❌ Cerrando modal registrar");
-              setModalRegistrarOpen(false);
-            }}
-            onRegistrarVenta={handleRegistrarVenta}
-          />
-        </>
-      )}
+      <RegistrarVentaModal
+        open={modalRegistrarOpen}
+        onClose={() => setModalRegistrarOpen(false)}
+        onRegistrarVenta={handleRegistrarVenta}
+      />
     </div>
   );
 };
