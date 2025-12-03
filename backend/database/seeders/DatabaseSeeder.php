@@ -54,6 +54,7 @@ class DatabaseSeeder extends Seeder
             
             DetalleCompraSeeder::class,
             DetalleVentaSeeder::class,
+            DashboardSeeder::class,
             
         ]);
         echo "bd llena";

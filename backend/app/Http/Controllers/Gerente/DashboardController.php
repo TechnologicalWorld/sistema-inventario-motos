@@ -14,6 +14,8 @@ class DashboardController extends Controller
     {
         try {
             $user = $request->user();
+            $anio = $request->input('anio', date('Y'));
+            $mes = $request->input('mes', date('m'));
             
             if (!$user) {
                 return response()->json([
@@ -23,43 +25,46 @@ class DashboardController extends Controller
             }
 
             $empleadoId = $user->idUsuario;
+            $productosSinVenta = DB::select('CALL sp_productos_sin_venta_mes(?, ?)', [$anio, $mes]);
+            $nroComprasGerente = DB::select('CALL sp_nro_compras_gerente_mes(?, ?, ?)', [$anio, $mes, $empleadoId]);
+            $productosSinStock = DB::select('CALL sp_productos_sin_stock()');
+            $nroProveedores = DB::select('CALL sp_nro_proveedores()');
+            $nroVentasMes = DB::select('CALL sp_nro_ventas_mes(?, ?)', [$anio, $mes]);
+            $totalVentasMes = DB::select('CALL sp_total_ventas_mes(?, ?)', [$anio, $mes]);
+            $topProductosGerente = DB::select('CALL sp_top_productos_gerente_mes(?, ?, ?)', [$anio, $mes, $empleadoId]);
+            $ventasPorDiaSemana = DB::select('CALL sp_ventas_por_dia_semana(?, ?)', [$anio, $mes]);
+            $ventasPorHora = DB::select('CALL sp_ventas_por_hora(?, ?)', [$anio, $mes]);
+            $ventasMensualesAnio = DB::select('CALL sp_ventas_mensuales_anio(?)', [$anio]);
+            $topProductosVendidosMes = DB::select('CALL sp_top_productos_vendidos_mes(?, ?)', [$anio, $mes]);
+            $topCategoriasVendidasMes = DB::select('CALL sp_top_categorias_vendidas_mes(?, ?)', [$anio, $mes]);
+            $topProductosComprados = DB::select('CALL sp_top_productos_comprados()');
+            $topCategoriasCompradas = DB::select('CALL sp_top_categorias_compradas()');
+            $comprasMensualesAnio = DB::select('CALL sp_compras_mensuales_anio(?)', [$anio]);
+            $productosStockMinimo = DB::select('CALL sp_productos_stock_minimo()');
+            $productosSinStockDetalle = DB::select('CALL sp_productos_sin_stock_detalle()');
 
-            // Últimas ventas del empleado
-            $ultimasVentas = Venta::with(['cliente.persona', 'detalleVentas'])
-                ->where('idEmpleado', $empleadoId)
-                ->latest()
-                ->limit(5)
-                ->get();
-
-            // Productos con stock bajo
-            $stockBajo = Producto::with('categoria')
-                ->stockBajo()
-                ->orderBy('stock')
-                ->limit(5)
-                ->get();
-
-            // Últimos movimientos del empleado
-            $ultimosMovimientos = MovimientoInventario::with('producto')
-                ->where('idEmpleado', $empleadoId)
-                ->latest()
-                ->limit(5)
-                ->get();
-
-            $estadisticas = [
-                'ventas_hoy' => Venta::where('idEmpleado', $empleadoId)
-                    ->whereDate('fecha', today())->count(),
-                'movimientos_hoy' => MovimientoInventario::where('idEmpleado', $empleadoId)
-                    ->whereDate('fechaMovimiento', today())->count(),
-                'productos_stock_bajo' => $stockBajo->count()
-            ];
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'estadisticas' => $estadisticas,
-                    'ultimas_ventas' => $ultimasVentas,
-                    'stock_bajo' => $stockBajo,
-                    'ultimos_movimientos' => $ultimosMovimientos
+                    'productos_sin_venta' => $productosSinVenta,
+                    'nro_compras_gerente' => $nroComprasGerente,
+                    'productos_sin_stock' => $productosSinStock,
+                    'nro_proveedores' => $nroProveedores,
+                    'nro_ventas_mes' => $nroVentasMes,
+                    'total_ventas_mes' => $totalVentasMes,
+                    'top_productos_gerente' => $topProductosGerente,
+                    'ventas_por_dia_semana' => $ventasPorDiaSemana,
+                    'ventas_por_hora' => $ventasPorHora,
+                    'ventas_mensuales_anio' => $ventasMensualesAnio,
+                    'top_productos_vendidos_mes' => $topProductosVendidosMes,
+                    'top_categorias_vendidas_mes' => $topCategoriasVendidasMes,
+                    'top_productos_comprados' => $topProductosComprados,
+                    'top_categorias_compradas' => $topCategoriasCompradas,
+                    'compras_mensuales_anio' => $comprasMensualesAnio,
+                    'productos_stock_minimo' => $productosStockMinimo,
+                    'productos_sin_stock_detalle' => $productosSinStockDetalle,
+                    
                 ]
             ], 200);
 
