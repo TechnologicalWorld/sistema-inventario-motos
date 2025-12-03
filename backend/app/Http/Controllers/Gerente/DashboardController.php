@@ -7,6 +7,7 @@ use App\Models\Venta;
 use App\Models\Producto;
 use App\Models\MovimientoInventario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {

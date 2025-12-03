@@ -23,7 +23,7 @@ import ComprasPage from "./pages/gerente/compras/pages/ComprasPage";
 import ProveedoresPage from "./pages/gerente/proveedores/pages/ProveedoresPage";
 import EmpleadosPage from "./pages/gerente/empleados/pages/EmpleadosPage";
 import DepartamentosPage from "./pages/gerente/departamentos/pages/DepartamentosPage";
-
+import DashboardGerente from "./pages/gerente/dashboard/DashboardGerente";
 // ========================
 // PROPIETARIO
 // ========================
@@ -37,6 +37,7 @@ import VentasPagePro from "./pages/propietario/ventas/pages/VentasPagePro";
 // ========================
 // EMPLEADO
 // ========================
+import DashboardEmpleado from "./pages/empleado/dashboard/DashboardEmpleado";
 import EmpleadoClientesPage from "./pages/empleado/clientes/pages/ClientesPage";
 import EmpleadoInventarioPage from "./pages/empleado/inventario/pages/InventarioPage";
 import EmpleadoVentaPage from "./pages/empleado/ventas/pages/VentasPage";
@@ -110,7 +111,7 @@ function App() {
         {/* RUTAS PARA ROL: GERENTE        */}
         {/* Prefix: /gerente/...           */}
         {/* ============================== */}
-        <Route path="gerente/dashboard" element={<GerenteDashboard />} />
+        <Route path="gerente/dashboard" element={<DashboardGerente/>} />
 
         {/* Inventarios - Gerente */}
         <Route path="gerente/inventarios/productos" element={<ProductosPage />}/>
@@ -139,7 +140,7 @@ function App() {
         {/* RUTAS PARA ROL: EMPLEADO       */}
         {/* Prefix: /empleado/...          */}
         {/* ============================== */}
-        <Route path="empleado/dashboard" element={<EmpleadoDashboard />} />
+        <Route path="empleado/dashboard" element={<DashboardEmpleado />} />
 
         <Route path="empleado/clientes" element={<EmpleadoClientesPage />} />
         <Route path="empleado/inventario" element={<EmpleadoInventarioPage />} />

@@ -1,89 +1,123 @@
+// src/services/dashboardPropietarioService.ts
 import api from "../../../services/api";
 
-// Dashboard: respuesta completa de la API
-export interface DashboardApiResponse {
-  success: boolean;
-  data: DashboardData;
+// ==================== INTERFACES ====================
+
+// 1. Ventas por categoría
+export interface VentaPorCategoria {
+  Categoria: string;
+  TotalVendido: string;
+  NroVendidos: number;
+  Ganancia: string;
+  ProporcionNroVenta: string;
 }
 
-// Data interna del dashboard
-export interface DashboardData {
-  estadisticas: EstadisticasDashboard;
-  ventas_compras: VentasComprasPorFecha;
-  stock_minimo: ProductoStockMinimo[];
-  top_productos: TopProducto[];
-  clientes_frecuentes: ClienteFrecuente[];
-}
-
-// ====== ESTADÍSTICAS ======
-export interface EstadisticasDashboard {
-  ventas_hoy: number;
-  ventas_mes: number;
-  compras_mes: number;
-  clientes_totales: number;
-  productos_stock_bajo: number;
-}
-
-// ====== VENTAS vs COMPRAS (por fecha) ======
-export interface VentasComprasItem {
-  ventas: number;
-  compras: number;
-}
-
-// Ejemplo de clave: "2025-11-27"
-export type VentasComprasPorFecha = Record<string, VentasComprasItem>;
-
-// ====== PRODUCTOS CON STOCK MÍNIMO ======
-export interface CategoriaProducto {
-  idCategoria: number;
-  nombre: string;
-  descripcion: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ProductoStockMinimo {
-  idProducto: number;
-  nombre: string;
-  codigoProducto: string;
-  descripcion: string;
-  precioVenta: string;   // viene como string en el JSON
-  precioCompra: string;  // también string
+// 2. Productos sin venta
+export interface ProductoSinVenta {
+  NombreProducto: string;
+  Categoria: string;
   stock: number;
   stockMinimo: number;
-  estado: string;
-  idCategoria: number;
-  created_at: string;
-  updated_at: string;
-  categoria: CategoriaProducto;
 }
 
-// ====== TOP PRODUCTOS MÁS VENDIDOS ======
-export interface TopProducto {
+// 3. Movimientos de inventario
+export interface MovimientoInventario {
   nombre: string;
-  total_vendido: string; // en el ejemplo viene como "16", "9", etc. (string)
+  tipo: string;
+  TotalMov: string;
 }
 
-// ====== CLIENTES FRECUENTES ======
-export interface ClienteFrecuente {
-  nombres: string;
-  paterno: string;
-  materno: string;
-  total_compras: number;
-  monto_total: string; // viene como string: "8271.45"
+// 4. Compras por producto
+export interface CompraPorProducto {
+  nombre: string;
+  TotalGastado: string;
+  CantidadComprada: string;
+  ProporcionComprada: string;
 }
 
-class DashboardService {
-  async getDashboard(): Promise<DashboardData> {
-    const { data } = await api.get<DashboardApiResponse>("propietario/dashboard");
+// 5. Gasto total mes
+export interface GastoTotalMes {
+  GastoTotal: string;
+}
+
+// 6. Total ventas mes
+export interface TotalVentasMes {
+  TotalVentas: string;
+}
+
+// 7. Número de ventas mes
+export interface NroVentasMes {
+  NroVentas: number;
+}
+
+// 8. Número de empresas proveedoras
+export interface NroEmpresasProveedoras {
+  NroEmpresasProvedoras: number;
+}
+
+// 9. Cantidad productos activos
+export interface CantidadProductosActivos {
+  CantidadProductosActivos: number;
+}
+
+// 10. Cantidad productos inactivos
+export interface CantidadProductosInactivos {
+  CantidadProductosInactivos: number;
+}
+
+// Interface principal del dashboard del propietario
+export interface PropietarioDashboardData {
+  ventas_por_categoria: VentaPorCategoria[];
+  productos_sin_venta: ProductoSinVenta[];
+  movimientos_inventario: MovimientoInventario[];
+  compras_por_producto: CompraPorProducto[];
+  gasto_total_mes: GastoTotalMes[];
+  total_ventas_mes: TotalVentasMes[];
+  nro_ventas_mes: NroVentasMes[];
+  nro_empresas_provedoras: NroEmpresasProveedoras[];
+  cantidad_productos_activos: CantidadProductosActivos[];
+  cantidad_productos_inactivos: CantidadProductosInactivos[];
+}
+
+// Interface para la respuesta de la API
+export interface PropietarioDashboardApiResponse {
+  success: boolean;
+  message?: string;
+  data: PropietarioDashboardData;
+}
+
+// Parámetros opcionales para el dashboard
+export interface PropietarioDashboardParams {
+  anio?: number;
+  mes?: number;
+}
+
+// ==================== CLASE DASHBOARD SERVICE ====================
+
+// src/services/dashboardPropietarioService.ts
+class DashboardPropietarioService {
+  /**
+   * Obtiene todos los datos del dashboard del propietario
+   */
+  async getDashboard(params?: PropietarioDashboardParams): Promise<PropietarioDashboardData> {
+    // Si no se pasan parámetros, usa el mes y año actual
+    const defaultParams = {
+      anio: new Date().getFullYear(),
+      mes: new Date().getMonth() + 1
+    };
+    
+    const queryParams = params || defaultParams;
+    
+    const { data } = await api.get<PropietarioDashboardApiResponse>("propietario/dashboard", {
+      params: queryParams
+    });
 
     if (!data.success) {
-      throw new Error("Error al cargar el dashboard");
+      throw new Error(data.message || "Error al cargar el dashboard del propietario");
     }
 
-    return data.data;
+    return data.data;  
   }
 }
-
-const dashboardService = new DashboardService();
-export default dashboardService; 
+const dashboardPropietarioService = new DashboardPropietarioService();
+export default dashboardPropietarioService;
