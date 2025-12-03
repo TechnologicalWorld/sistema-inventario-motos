@@ -62,6 +62,7 @@ const EmpleadoDashboard = () => (
 // Componente para redirigir al dashboard según el rol
 const NavigateToDashboard = () => {
   const { user } = useAuth();
+  
 
   if (!user) return <Navigate to="/login" replace />;
 

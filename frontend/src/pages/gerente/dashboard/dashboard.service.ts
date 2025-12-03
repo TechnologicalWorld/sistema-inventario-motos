@@ -146,15 +146,26 @@ export interface DashboardApiResponse {
   message?: string;
   data: DashboardData;
 }
-
-// ==================== CLASE DASHBOARD SERVICE ====================
-
+export interface DashboardParams {
+  iduser: number;
+  anio?: number;
+  mes?: number;
+}
 class DashboardService {
   /**
    * Obtiene todos los datos del dashboard del gerente
    */
-  async getDashboard(): Promise<DashboardData> {
-    const { data } = await api.get<DashboardApiResponse>("gerente/dashboard");
+  async getDashboard(params: DashboardParams): Promise<DashboardData> {
+    // Agregar valores por defecto para año y mes si no se proporcionan
+    const queryParams = {
+      iduser: params.iduser,
+      anio: params.anio || new Date().getFullYear(),
+      mes: params.mes || new Date().getMonth() + 1
+    };
+    
+    const { data } = await api.get<DashboardApiResponse>("gerente/dashboard", {
+      params: queryParams
+    });
 
     if (!data.success) {
       throw new Error("Error al cargar el dashboard");

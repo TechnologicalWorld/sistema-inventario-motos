@@ -15,6 +15,7 @@ class DashboardController extends Controller
     {
         try {
             $user = $request->user();
+            $paramUserId = $request->input('iduser');
             $anio = $request->input('anio', date('Y'));
             $mes = $request->input('mes', date('m'));
             
@@ -65,6 +66,7 @@ class DashboardController extends Controller
                     'compras_mensuales_anio' => $comprasMensualesAnio,
                     'productos_stock_minimo' => $productosStockMinimo,
                     'productos_sin_stock_detalle' => $productosSinStockDetalle,
+                    'iduse'=>$paramUserId
                     
                 ]
             ], 200);

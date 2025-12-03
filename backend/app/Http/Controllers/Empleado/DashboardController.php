@@ -24,7 +24,7 @@ class DashboardController extends Controller
                 ], 401);
             }
 
-            $empleadoId = $user->idUsuario;
+        $empleadoId = $request->input('iduser');
         $ventas = DB::select('CALL sp_contar_ventas_empleado(?, ?, ?)', [$empleadoId, $anio, $mes]);
         $totalVendido = DB::select('CALL sp_total_vendido_empleado(?, ?, ?)', [$empleadoId, $anio, $mes]);
         $clientes = DB::select('CALL sp_contar_clientes_empleado(?, ?, ?)', [$empleadoId, $anio, $mes]);
