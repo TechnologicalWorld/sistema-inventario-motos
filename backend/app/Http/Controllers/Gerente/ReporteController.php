@@ -11,6 +11,40 @@ use Illuminate\Support\Facades\Validator;
 
 class ReporteController extends Controller
 {
+    public function index(Request $request){
+        $user = $request->user();
+        $anio = $request->input('anio', date('Y'));
+        $mes = $request->input('mes', date('m'));
+
+
+        if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Usuario no autenticado'
+                ], 401);
+            }
+
+        $empleadoId = $request->input('iduser');
+        
+        $ventasEmpleados = DB::select('CALL sp_ventas_por_empleado_mensual(?, ?)', [$anio, $mes]);   
+        $comprasGerente = DB::select('CALL sp_compras_por_producto_mensual_optional(?, ?, ?)', [$anio, $mes, $empleadoId]);
+        $productosStock = DB::select('CALL sp_productos_stock()');
+        $conteoStockCritico = DB::select('CALL sp_conteo_stock_critico()');
+        $gananciasProducto = DB::select('CALL sp_ganancias_producto_mensual(?, ?)', [$anio, $mes]);
+        $resumenGanancias = DB::select('CALL sp_resumen_ganancias_mensual(?, ?)', [$anio, $mes]);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'ventas_empleados' => $ventasEmpleados,
+                'compras_gerente' => $comprasGerente,
+                'productos_stock' => $productosStock,
+                'conteo_stock_critico' => $conteoStockCritico,
+                'ganancias_producto' => $gananciasProducto,
+                'resumen_ganancias' => $resumenGanancias
+            ]
+        ], 200);
+    }
     public function ventas(Request $request)
     {
         $validator = Validator::make($request->all(), [

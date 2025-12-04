@@ -9,9 +9,32 @@ use App\Models\Producto;
 use App\Models\Empleado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class ReporteController extends Controller
 {
+    public function index(Request $request){
+        $anio=$request->input('anio', date('Y'));
+        $mes=$request->input('mes', date('m'));
+        $gananciasProducto = DB::select('CALL sp_ganancias_producto_mensual(?, ?)', [$anio, $mes]);
+        $resumenGanancias = DB::select('CALL sp_resumen_ganancias_mensual(?, ?)', [$anio, $mes]);
+        $productosStock = DB::select('CALL sp_productos_stock()');
+        $conteoStockCritico = DB::select('CALL sp_conteo_stock_critico()');
+        $costosCompra = DB::select('CALL sp_costos_compra_mensual(?, ?)', [$anio, $mes]);
+        $resumenCompras = DB::select('CALL sp_resumen_compras_mensual(?, ?)', [$anio, $mes]);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'ganancias_producto' => $gananciasProducto,
+                'resumen_ganancias' => $resumenGanancias,
+                'productos_stock' => $productosStock,
+                'conteo_stock_critico' => $conteoStockCritico,
+                'costos_compra' => $costosCompra,
+                'resumen_compras' => $resumenCompras
+            ]
+        ], 200);
+    }
     public function ventasPorFechas(Request $request)
     {
         $validator = Validator::make($request->all(), [

@@ -14,7 +14,7 @@ use App\Http\Controllers\Propietario\CompraController;
 use App\Http\Controllers\Propietario\EmpleadoController;
 use App\Http\Controllers\Propietario\ProveedorController;
 use App\Http\Controllers\Propietario\GerenteController;
-use App\Http\Controllers\Propietario\ReporteController;
+use App\Http\Controllers\Propietario\ReporteController as PropietarioReporteController;
 
 // Controladores del Gerente
 use App\Http\Controllers\Gerente\DashboardController as GerenteDashboardController;
@@ -79,7 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Dashboard
         Route::get('/dashboard', [PropietarioDashboardController::class, 'index']);
-        
+        // Reportes
+        Route::get('/reportes', [PropietarioReporteController::class, 'index']);
         // Empresa
         Route::prefix('empresa')->group(function () {
             Route::get('/', [EmpresaController::class, 'show']);
@@ -169,13 +170,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}', [GerenteController::class, 'show']);
             Route::get('/{id}/desempenio', [GerenteController::class, 'desempenio']);
         });
-        // Reportes
-        Route::prefix('reportes')->group(function () {
-            Route::post('/ventas-fechas', [ReporteController::class, 'ventasPorFechas']);
-            Route::get('/compras-proveedor', [ReporteController::class, 'comprasPorProveedor']);
-            Route::get('/stock-minimo', [ReporteController::class, 'stockMinimo']);
-            Route::get('/empleados-departamento', [ReporteController::class, 'empleadosPorDepartamento']);
-        });
     });
 
     // ============================================================================
@@ -185,6 +179,7 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Dashboard
         Route::get('/dashboard', [GerenteDashboardController::class, 'index']);
+        Route::get('/reportes', [GerenteReporteController::class, 'index']);
         
         // Inventario - CRUD Completo
         Route::prefix('inventario')->group(function () {
@@ -263,11 +258,6 @@ Route::middleware('auth:sanctum')->group(function () {
         });
         
         // Reportes
-        Route::prefix('reportes')->group(function () {
-            Route::post('/ventas', [GerenteReporteController::class, 'ventas']);
-            Route::post('/compras', [GerenteReporteController::class, 'compras']);
-            Route::get('/inventario', [GerenteReporteController::class, 'inventario']);
-        });
         
         // Catálogos adicionales para Gerente
         Route::get('/catalogos/proveedores', [CatalogoController::class, 'proveedores']);
