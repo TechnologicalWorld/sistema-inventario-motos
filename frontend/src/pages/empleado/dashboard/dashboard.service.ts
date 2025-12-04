@@ -1,7 +1,3 @@
-// src/services/empleadoDashboardService.ts
-// ==================== INTERFACES ====================
-
-// Interface principal del dashboard del empleado
 export interface EmpleadoDashboardData {
   ventas: number;
   total_vendido: number;
@@ -41,8 +37,6 @@ export interface EmpleadoDashboardData {
     [key: string]: any;
   }>;
 }
-
-// Interface para la respuesta de la API
 export interface EmpleadoDashboardApiResponse {
   success: boolean;
   message?: string;
@@ -54,14 +48,8 @@ export interface DashboardParams {
   mes?: number;
 }
 
-// ==================== CLASE EMPLEADO DASHBOARD SERVICE ====================
-
-// src/services/empleadoDashboardService.ts
 import api from "../../../services/api";
 
-// ==================== INTERFACES ====================
-
-// Interface principal del dashboard del empleado
 export interface EmpleadoDashboardData {
   ventas: number;
   total_vendido: number;
@@ -102,29 +90,23 @@ export interface EmpleadoDashboardData {
   }>;
 }
 
-// Interface para la respuesta de la API
 export interface EmpleadoDashboardApiResponse {
   success: boolean;
   message?: string;
   data: EmpleadoDashboardData;
 }
 
-// Interface para los parámetros de consulta
 export interface DashboardParams {
   iduser: number;
   anio?: number;
   mes?: number;
 }
-
-// ==================== CLASE EMPLEADO DASHBOARD SERVICE ====================
 
 class EmpleadoDashboardService {
   /**
-   * Obtiene los datos del dashboard del empleado
-   * @param params - Parámetros de consulta (iduser, anio, mes)
+   * @param params 
    */
   async getDashboard(params: DashboardParams): Promise<EmpleadoDashboardData> {
-    // Agregar valores por defecto para año y mes si no se proporcionan
     const queryParams = {
       iduser: params.iduser,
       anio: params.anio || new Date().getFullYear(),

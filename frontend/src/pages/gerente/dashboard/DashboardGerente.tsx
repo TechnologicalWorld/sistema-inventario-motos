@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { TrendingUp, Package, DollarSign, ShoppingCart, AlertCircle, Calendar, BarChart3, Users, Clock } from 'lucide-react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
-// Interfaces
 interface ProductoSinVenta {
   NombreProducto: string;
   Categoria: string;
@@ -102,9 +101,6 @@ export default function DashboardGerente() {
         mes 
       });
       
-      console.log("📊 Dashboard Data RAW:", rawData);
-      
-      // Transformar snake_case a camelCase y convertir strings a números
       const transformedData: DashboardData = {
         productosSinVenta: (rawData as any).productos_sin_venta || [],
         nroComprasGerente: (rawData as any).nro_compras_gerente || [],
@@ -216,14 +212,12 @@ export default function DashboardGerente() {
     );
   }
 
-  // Valores por defecto seguros
   const totalVentas = dashboardData.totalVentasMes?.[0]?.TotalVentas || 0;
   const nroVentas = dashboardData.nroVentasMes?.[0]?.NroVentas || 0;
   const nroCompras = dashboardData.nroComprasGerente?.[0]?.NroCompras || 0;
   const nroProveedores = dashboardData.nroProveedores?.[0]?.NroProveedores || 0;
   const productosSinStock = dashboardData.productosSinStock?.[0]?.NroProductosSinStock || 0;
 
-  // Transformación de datos para gráficos - YA ESTÁN CONVERTIDOS A NÚMEROS
   const topProductosData = Array.isArray(dashboardData.topProductosVendidosMes) 
     ? dashboardData.topProductosVendidosMes.slice(0, 10).map(p => ({
         nombre: p.nombre || 'Sin nombre',
@@ -242,7 +236,6 @@ export default function DashboardGerente() {
 
   const ventasPorDiaData = Array.isArray(dashboardData.ventasPorDiaSemana)
     ? dashboardData.ventasPorDiaSemana.map(v => {
-        // El DiaSemana viene como 'Monday', 'Tuesday', etc.
         const diaMap: Record<string, string> = {
           'Monday': 'Lunes',
           'Tuesday': 'Martes',
@@ -289,7 +282,6 @@ export default function DashboardGerente() {
 
   const COLORS = ['#C41E3A', '#DC2626', '#EF4444', '#F87171', '#FCA5A5', '#FEE2E2'];
 
-  // Componente para mostrar mensaje cuando no hay datos
   const NoDataMessage = ({ message }: { message: string }) => (
     <div className="flex items-center justify-center h-64 text-gray-500">
       <div className="text-center">

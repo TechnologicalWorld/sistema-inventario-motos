@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { TrendingUp, Package, DollarSign, ShoppingCart, AlertCircle, Calendar, BarChart3 } from 'lucide-react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-// Interfaces
 interface VentaPorCategoria {
   Categoria: string;
   TotalVendido: string;
@@ -104,7 +103,6 @@ function PropietarioDashboardComponent() {
   const productosInactivos = dashboardData.cantidad_productos_inactivos[0]?.CantidadProductosInactivos || 0;
   const empresasProvedoras = dashboardData.nro_empresas_provedoras[0]?.NroEmpresasProvedoras || 0;
 
-  // Datos para gráficos
   const ventasChartData = dashboardData.ventas_por_categoria.map(v => ({
     categoria: v.Categoria,
     ventas: parseFloat(v.TotalVendido),

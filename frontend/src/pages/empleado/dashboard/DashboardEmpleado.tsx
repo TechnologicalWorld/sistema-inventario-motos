@@ -80,7 +80,6 @@ export default function DashboardEmpleado() {
     setShowFilters(false);
   };
 
-  // Componente para mostrar cuando no hay datos
   const NoDataMessage = ({ message }: { message: string }) => (
     <div className="flex items-center justify-center h-64 text-gray-500">
       <div className="text-center">
@@ -126,7 +125,6 @@ export default function DashboardEmpleado() {
     );
   }
 
-  // Preparar datos para gráficos - CORREGIDO para mapear correctamente
   console.log("📊 Preparando datos para gráficos...");
   console.log("ventas_por_producto:", dashboardData.ventas_por_producto);
   console.log("ventas_por_mes:", dashboardData.ventas_por_mes);
@@ -143,16 +141,16 @@ export default function DashboardEmpleado() {
   const ventasPorMesData = (dashboardData.ventas_por_mes || [])
     .map((v: any) => ({
       mes: meses[(v.mes || 1) - 1] || `Mes ${v.mes}`,
-      ventas: 1, // No viene el número de ventas, ponemos 1 por registro
-      monto: parseFloat(v['sum(v.montoTotal)']?.toString() || '0') // ⚠️ Nombre raro de columna
+      ventas: 1, 
+      monto: parseFloat(v['sum(v.montoTotal)']?.toString() || '0') 
     }));
 
   const ventas2024Data = (dashboardData.ventas_2024_con_cantidades || [])
     .map((v: any) => ({
       mes: meses[(v.mes || 1) - 1] || `Mes ${v.mes}`,
-      ventas: 1, // Similar, no viene número de ventas
-      monto: parseFloat(v.TotalVendido?.toString() || '0'), // ⚠️ TotalVendido con mayúsculas
-      cantidad: parseFloat(v.CantidadVendida?.toString() || '0') // ⚠️ CantidadVendida con mayúsculas
+      ventas: 1, 
+      monto: parseFloat(v.TotalVendido?.toString() || '0'), 
+      cantidad: parseFloat(v.CantidadVendida?.toString() || '0') 
     }));
 
   console.log("✅ Datos transformados:");
