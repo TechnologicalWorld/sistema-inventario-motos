@@ -207,12 +207,17 @@ const propietarioMenu: MenuItem[] = [
     children: [
       {
         label: "Productos",
-        to: "/propietario/productos",
+        to: "/propietario/inventario/productos",
         icon: <FiBox className="text-sm" />,
       },
       {
         label: "Categorías",
-        to: "/categorias",
+        to: "/propietario/inventario/categorias",
+        icon: <FiPackage className="text-sm" />,
+      },
+      {
+        label: "Movimientos",
+        to: "/propietario/inventario/movimientos",
         icon: <FiPackage className="text-sm" />,
       },
     ],
@@ -367,7 +372,7 @@ const empleadoMenu: MenuItem[] = [
     icon: <FiUsers className="text-lg" />,
     to: "/empleado/clientes",
   },
-  
+
   {
     id: "emp-movimientos",
     label: "Movimientos",
@@ -411,7 +416,7 @@ function CollapsedParentItem({ item }: { item: MenuItem }) {
     if (!open && btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
 
-      const OFFSET = 65; 
+      const OFFSET = 65;
       const newTop = Math.max(8, rect.top - OFFSET);
 
       setTop(newTop);
@@ -462,7 +467,6 @@ function CollapsedParentItem({ item }: { item: MenuItem }) {
     </>
   );
 }
-
 
 // -------------------- Sidebar principal --------------------
 
