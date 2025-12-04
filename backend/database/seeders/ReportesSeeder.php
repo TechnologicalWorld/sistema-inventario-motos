@@ -14,7 +14,7 @@ class ReportesSeeder extends Seeder
     public function run()
     {
         // Primero eliminar todos los procedimientos
-        $this->dropAllProcedures();
+        $this->dropExistingProcedures();
         
         // Esperar un momento para asegurar que se eliminaron
         sleep(1);
@@ -23,21 +23,7 @@ class ReportesSeeder extends Seeder
         $this->createProcedures();
     }
 
-    private function dropAllProcedures()
-    {
-        try {
-            
-            // Eliminar cada procedimiento
-            foreach ($procedures as $procedure) {
-                $name = $procedure->routine_name;
-                DB::statement("DROP PROCEDURE IF EXISTS `$name`");
-            }
-            
-            $this->command->info('Todos los procedimientos almacenados eliminados correctamente.');
-        } catch (\Exception $e) {
-            $this->command->warn('Error al eliminar procedimientos: ' . $e->getMessage());
-        }
-    }
+    
 
     private function dropExistingProcedures()
     {

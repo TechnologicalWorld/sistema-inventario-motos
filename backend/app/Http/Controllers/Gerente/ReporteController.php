@@ -8,24 +8,34 @@ use App\Models\Compra;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class ReporteController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+{
+    try {
         $user = $request->user();
         $anio = $request->input('anio', date('Y'));
         $mes = $request->input('mes', date('m'));
 
-
         if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'Usuario no autenticado'
-                ], 401);
-            }
+            return response()->json([
+                'success' => false,
+                'error' => 'Usuario no autenticado'
+            ], 401);
+        }
 
         $empleadoId = $request->input('iduser');
         
+        // Validar parámetros
+        if (!is_numeric($anio) || !is_numeric($mes)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Año y mes deben ser numéricos'
+            ], 400);
+        }
+
         $ventasEmpleados = DB::select('CALL sp_ventas_por_empleado_mensual(?, ?)', [$anio, $mes]);   
         $comprasGerente = DB::select('CALL sp_compras_por_producto_mensual_optional(?, ?, ?)', [$anio, $mes, $empleadoId]);
         $productosStock = DB::select('CALL sp_productos_stock()');
@@ -36,15 +46,25 @@ class ReporteController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'ventas_empleados' => $ventasEmpleados,
-                'compras_gerente' => $comprasGerente,
-                'productos_stock' => $productosStock,
-                'conteo_stock_critico' => $conteoStockCritico,
-                'ganancias_producto' => $gananciasProducto,
-                'resumen_ganancias' => $resumenGanancias
+                'ventas_empleados' => $ventasEmpleados ?? [],
+                'compras_gerente' => $comprasGerente ?? [],
+                'productos_stock' => $productosStock ?? [],
+                'conteo_stock_critico' => $conteoStockCritico ?? [],
+                'ganancias_producto' => $gananciasProducto ?? [],
+                'resumen_ganancias' => $resumenGanancias ?? []
             ]
         ], 200);
+
+    } catch (\Exception $e) {
+        \Log::error('Error en reportes gerente: ' . $e->getMessage());
+        
+        return response()->json([
+            'success' => false,
+            'error' => 'Error interno del servidor',
+            'message' => env('APP_DEBUG') ? $e->getMessage() : null
+        ], 500);
     }
+}
     public function ventas(Request $request)
     {
         $validator = Validator::make($request->all(), [
