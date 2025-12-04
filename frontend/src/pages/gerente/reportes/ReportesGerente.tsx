@@ -279,8 +279,8 @@ export default function ReporteGerente() {
         pdf.text(`$${Number(venta.TotalVendido).toFixed(2)}`, xPos, yPos);
         xPos += colWidths[1];
         
-        // Número de ventas
-        pdf.text(venta.NroVentas, xPos, yPos);
+        // Número de ventas - CORREGIDO: convertir a string
+        pdf.text(venta.NroVentas.toString(), xPos, yPos);
         xPos += colWidths[2];
         
         // Promedio
@@ -348,8 +348,8 @@ export default function ReporteGerente() {
         pdf.text(`$${Number(compra.TotalPago).toFixed(2)}`, xPos, yPos);
         xPos += colWidths[1];
         
-        // Unidades
-        pdf.text(compra.UnitCompradas, xPos, yPos);
+        // Unidades - CORREGIDO: convertir a string
+        pdf.text(compra.UnitCompradas.toString(), xPos, yPos);
         xPos += colWidths[2];
         
         // Gerente
@@ -451,8 +451,8 @@ export default function ReporteGerente() {
         pdf.setTextColor(0, 0, 0); // Volver a negro
         xPos += colWidths[1];
         
-        // Unidades
-        pdf.text(ganancia.total_unidades_vendidas, xPos, yPos);
+        // Unidades - CORREGIDO: convertir a string
+        pdf.text(ganancia.total_unidades_vendidas.toString(), xPos, yPos);
         xPos += colWidths[2];
         
         // Ganancia por unidad

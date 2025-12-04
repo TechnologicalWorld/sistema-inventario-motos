@@ -24,9 +24,11 @@ import ProveedoresPage from "./pages/gerente/proveedores/pages/ProveedoresPage";
 import EmpleadosPage from "./pages/gerente/empleados/pages/EmpleadosPage";
 import DepartamentosPage from "./pages/gerente/departamentos/pages/DepartamentosPage";
 import DashboardGerente from "./pages/gerente/dashboard/DashboardGerente";
+import ReportesGerente from "./pages/gerente/reportes/ReportesGerente";
 // ========================
 // PROPIETARIO
 // ========================
+import ReportesPropietario from "./pages/propietario/reportes/ReportesPropietario";
 import ProductosPagePropietario from "./pages/propietario/inventario/productos/pages/ProductoPage";
 import CategoriasPagePropietario from "./pages/propietario/inventario/categorias/pages/CategoriaPage";
 import MovimientosPagePropietario from "./pages/propietario/inventario/movimientos/pages/MovimientosPage";
@@ -115,6 +117,10 @@ function App() {
         {/* Prefix: /gerente/...           */}
         {/* ============================== */}
         <Route path="gerente/dashboard" element={<DashboardGerente />} />
+        <Route
+          path="gerente/reportes"
+          element={<ReportesGerente />}
+        />
 
         {/* Inventarios - Gerente */}
         <Route
@@ -176,6 +182,10 @@ function App() {
         <Route
           path="propietario/dashboard"
           element={<DashboardPropietario />}
+        />
+        <Route
+          path="propietario/reportes"
+          element={<ReportesPropietario />}
         />
         <Route path="propietario/empresa" element={<EmpresaPagePro />} />
         <Route
