@@ -17,6 +17,7 @@ class DashboardController extends Controller
         try {
             $anio=$request->input('anio', date('Y'));
             $mes=$request->input('mes', date('m'));
+            
             $ventasPorCategoria = DB::select('CALL sp_ventas_por_categoria(?, ?)', [$anio, $mes]);
             $productosSinVenta = DB::select('CALL sp_productos_sin_venta_mes(?, ?)', [$anio, $mes]);
             $movimientosInventario = DB::select('CALL sp_movimientos_inventario_mes(?, ?)', [$anio, $mes]);

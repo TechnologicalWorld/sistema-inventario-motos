@@ -238,18 +238,7 @@ const propietarioMenu: MenuItem[] = [
     id: "prop-reportes",
     label: "Reportes",
     icon: <FiBarChart2 className="text-lg" />,
-    children: [
-      {
-        label: "Ventas",
-        to: "/reportes/ventas",
-        icon: <FiBarChart2 className="text-sm" />,
-      },
-      {
-        label: "Compras",
-        to: "/reportes/compras",
-        icon: <FiShoppingBag className="text-sm" />,
-      },
-    ],
+    to: "/propietario/reportes",
   },
 ];
 
@@ -322,23 +311,7 @@ const gerenteMenu: MenuItem[] = [
     id: "ger-reportes",
     label: "Reportes",
     icon: <FiFileText className="text-lg" />,
-    children: [
-      {
-        label: "Ventas",
-        to: "/gerente/reportes/ventas",
-        icon: <FiBarChart2 className="text-sm" />,
-      },
-      {
-        label: "Compras",
-        to: "/gerente/reportes/compras",
-        icon: <FiShoppingBag className="text-sm" />,
-      },
-      {
-        label: "Inventario",
-        to: "/gerente/reportes/inventario",
-        icon: <FiPackage className="text-sm" />,
-      },
-    ],
+    to: "/gerente/reportes",
   },
 ];
 

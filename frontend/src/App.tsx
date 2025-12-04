@@ -14,6 +14,7 @@ import { Perfil } from "./services/shared/Perfil";
 // ========================
 // GERENTE - Inventarios
 // ========================
+import ReporteGerente from "./pages/gerente/reportes/ReportesGerente";
 import ProductosPage from "./pages/gerente/inventario/productos/pages/ProductosPage";
 import CategoriasPage from "./pages/gerente/inventario/categorias/pages/CategoriasPage";
 import MovimientosPage from "./pages/gerente/inventario/movimientos/pages/MovimientosPage";
@@ -33,6 +34,7 @@ import EmpresaPagePro from "./pages/propietario/empresa/pages/EmpresaPagePro";
 import ProveedoresPagePro from "./pages/propietario/proveedores/pages/ProveedoresPagePro";
 import ComprasPagePro from "./pages/propietario/compras/pages/ComprasPagePro";
 import VentasPagePro from "./pages/propietario/ventas/pages/VentasPagePro";
+import ReportesPropietario from "./pages/propietario/reportes/ReportesPropietario";
 
 // ========================
 // EMPLEADO
@@ -113,6 +115,7 @@ function App() {
         {/* Prefix: /gerente/...           */}
         {/* ============================== */}
         <Route path="gerente/dashboard" element={<DashboardGerente/>} />
+        <Route path="gerente/reportes" element={<ReporteGerente />} />
 
         {/* Inventarios - Gerente */}
         <Route path="gerente/inventarios/productos" element={<ProductosPage />}/>
@@ -159,6 +162,7 @@ function App() {
         {/* Prefix: /propietario/...       */}
         {/* ============================== */}
         <Route path="propietario/dashboard" element={<DashboardPropietario />}/>
+        <Route path="propietario/reportes" element={<ReportesPropietario />}/>
         <Route path="propietario/empresa" element={<EmpresaPagePro />}/>
         <Route path="propietario/proveedores" element={<ProveedoresPagePro/>}/>
         <Route path="propietario/clientes" element={<ClientesPagePro/>}/>
