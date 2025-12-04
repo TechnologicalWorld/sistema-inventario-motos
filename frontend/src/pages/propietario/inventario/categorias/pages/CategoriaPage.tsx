@@ -10,7 +10,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
-import categoriasService, { Categoria } from "../categorias.service";
+import categoriasService, { type Categoria } from "../categorias.service";
 
 interface CategoriaFormState {
   idCategoria?: number;

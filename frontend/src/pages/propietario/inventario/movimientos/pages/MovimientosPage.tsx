@@ -7,8 +7,10 @@ import {
   FiChevronRight,
   FiEye,
 } from "react-icons/fi";
-import movimientosService, { Movimiento } from "../movimientos.service";
-import productosService, { Producto } from "../../productos/productos.service";
+import movimientosService, { type Movimiento } from "../movimientos.service";
+import productosService, {
+  type Producto,
+} from "../../productos/productos.service";
 
 type ModalMode = "create" | "detail" | null;
 

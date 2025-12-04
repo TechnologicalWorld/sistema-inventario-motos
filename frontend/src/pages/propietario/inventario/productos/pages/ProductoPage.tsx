@@ -10,9 +10,9 @@ import {
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
-import productosService, { Producto } from "../productos.service";
+import productosService, { type Producto } from "../productos.service";
 import categoriasService, {
-  Categoria,
+  type Categoria,
 } from "../../categorias/categorias.service";
 
 interface ProductoFormState {
