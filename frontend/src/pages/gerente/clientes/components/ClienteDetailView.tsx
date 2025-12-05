@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { FiChevronLeft, FiChevronRight, FiEye } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiEye, FiDownload } from "react-icons/fi";
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import { ClienteConResumen } from "../hooks/useClientesList";
 import { useClienteHistorial } from "../hooks/useClienteHistorial";
 import VentaDetalleModal from "./VentaDetalleModal";
@@ -19,6 +20,218 @@ function formatFecha(fechaIso: string | null | undefined) {
   const anio = d.getFullYear();
   return `${dia}/${mes}/${anio}`;
 }
+
+// Estilos para el PDF
+const styles = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontSize: 10,
+    fontFamily: 'Helvetica',
+  },
+  header: {
+    marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 2,
+    borderBottomColor: '#333',
+    borderBottomStyle: 'solid',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 12,
+    color: '#555',
+    marginBottom: 5,
+  },
+  infoSection: {
+    backgroundColor: '#f5f5f5',
+    padding: 15,
+    marginBottom: 20,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderStyle: 'solid',
+  },
+  infoGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  infoBox: {
+    flex: 1,
+    marginRight: 10,
+  },
+  infoLabel: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    marginBottom: 3,
+    color: '#374151',
+  },
+  infoValue: {
+    fontSize: 11,
+    marginBottom: 2,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 10,
+    color: '#374151',
+  },
+  table: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderStyle: 'solid',
+    borderRadius: 5,
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#d1d5db',
+    padding: 8,
+    fontWeight: 'bold',
+    fontSize: 9,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+    borderBottomStyle: 'solid',
+    fontSize: 9,
+  },
+  tableRowAlt: {
+    backgroundColor: '#f9fafb',
+  },
+  col1: { width: '15%' },
+  col2: { width: '15%' },
+  col3: { width: '30%' },
+  col4: { width: '20%' },
+  col5: { width: '20%', textAlign: 'right' },
+  footer: {
+    position: 'absolute',
+    bottom: 30,
+    left: 40,
+    right: 40,
+    textAlign: 'center',
+    fontSize: 8,
+    color: '#666',
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    borderTopStyle: 'solid',
+    paddingTop: 10,
+  },
+});
+
+// Componente PDF
+const ClienteHistorialPDF: React.FC<{ 
+  cliente: ClienteConResumen; 
+  ventas: VentaHistorial[];
+  resumen: any;
+}> = ({ cliente, ventas, resumen }) => {
+  const persona = cliente.persona;
+  const nombreCompleto = `${persona.nombres} ${persona.paterno}`;
+  const fechaGeneracion = new Date().toLocaleDateString('es-ES');
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>HISTORIAL DE COMPRAS</Text>
+          <Text style={styles.subtitle}>Cliente: {nombreCompleto}</Text>
+          <Text style={styles.subtitle}>Generado: {fechaGeneracion}</Text>
+        </View>
+
+        {/* Información del cliente */}
+        <View style={styles.infoSection}>
+          <View style={styles.infoGrid}>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoLabel}>Nombre Completo</Text>
+              <Text style={styles.infoValue}>{nombreCompleto}</Text>
+            </View>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoLabel}>CI / NIT</Text>
+              <Text style={styles.infoValue}>
+                {persona.ci} / {cliente.nit ?? "—"}
+              </Text>
+            </View>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoLabel}>Teléfono</Text>
+              <Text style={styles.infoValue}>{persona.telefono}</Text>
+            </View>
+          </View>
+
+          <View style={styles.infoGrid}>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoLabel}>Total Gastado</Text>
+              <Text style={styles.infoValue}>
+                Bs. {resumen?.totalGastado.toFixed(2) ?? "0.00"}
+              </Text>
+            </View>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoLabel}>Ticket Promedio</Text>
+              <Text style={styles.infoValue}>
+                Bs. {resumen ? resumen.ticketPromedio.toFixed(2) : "0.00"}
+              </Text>
+            </View>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoLabel}>Nº de Compras</Text>
+              <Text style={styles.infoValue}>
+                {resumen?.numeroCompras ?? 0}
+              </Text>
+            </View>
+            <View style={styles.infoBox}>
+              <Text style={styles.infoLabel}>Última Compra</Text>
+              <Text style={styles.infoValue}>
+                {resumen ? formatFecha(resumen.ultimaCompra) : "-"}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Tabla de compras */}
+        <Text style={styles.sectionTitle}>Detalle de Compras</Text>
+        <View style={styles.table}>
+          <View style={styles.tableHeader}>
+            <Text style={styles.col1}>ID Venta</Text>
+            <Text style={styles.col2}>Fecha</Text>
+            <Text style={styles.col3}>Empleado (Vendedor)</Text>
+            <Text style={styles.col4}>Método de pago</Text>
+            <Text style={styles.col5}>Monto Total</Text>
+          </View>
+          {ventas.map((v, idx) => (
+            <View
+              key={v.idVenta}
+              style={[styles.tableRow, idx % 2 === 1 && styles.tableRowAlt]}
+            >
+              <Text style={styles.col1}>
+                V-{v.idVenta.toString().padStart(4, "0")}
+              </Text>
+              <Text style={styles.col2}>{formatFecha(v.fecha)}</Text>
+              <Text style={styles.col3}>
+                {v.empleado.persona.nombres} {v.empleado.persona.paterno}
+              </Text>
+              <Text style={[styles.col4, { textTransform: 'capitalize' }]}>
+                {v.metodoPago}
+              </Text>
+              <Text style={styles.col5}>
+                Bs. {Number(v.montoTotal).toFixed(2)}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text>Historial de compras del cliente {nombreCompleto}</Text>
+          <Text>Total de compras registradas: {ventas.length}</Text>
+        </View>
+      </Page>
+    </Document>
+  );
+};
 
 const ClienteDetailView: React.FC<Props> = ({ cliente, onVolver }) => {
   const { data, resumen, loading, error } = useClienteHistorial(
@@ -66,6 +279,26 @@ const ClienteDetailView: React.FC<Props> = ({ cliente, onVolver }) => {
         <h1 className="text-xl md:text-2xl font-semibold text-gray-800">
           Detalle de Cliente - {nombreCompleto}
         </h1>
+        {!loading && !error && ventas.length > 0 && (
+          <PDFDownloadLink
+            document={
+              <ClienteHistorialPDF 
+                cliente={cliente} 
+                ventas={ventas} 
+                resumen={resumen}
+              />
+            }
+            fileName={`historial-${nombreCompleto.replace(/\s+/g, '-')}.pdf`}
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#c0163b] text-white text-sm hover:bg-[#a41333] transition-colors"
+          >
+            {({ loading }) => (
+              <>
+                <FiDownload />
+                {loading ? 'Preparando...' : 'Descargar Historial'}
+              </>
+            )}
+          </PDFDownloadLink>
+        )}
       </div>
 
       {/* Resumen superior */}

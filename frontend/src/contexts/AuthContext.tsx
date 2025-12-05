@@ -1,6 +1,5 @@
-/* eslint-disable react-refresh/only-export-components */
-// src/contexts/AuthContext.tsx
 import React, { createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { authService } from "../services/auth/authService";
 import type { LoginData, RegisterData, User, UserRole } from "../types/auth";
 
@@ -12,7 +11,7 @@ export interface AuthContextType {
   logout: () => void;
   loading: boolean;
   hasRole: (roles: UserRole | UserRole[]) => boolean;
-  getRole: ()=>UserRole | null;
+  getRole: () => UserRole | null;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -24,6 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkAuth();
@@ -37,7 +37,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(userData);
       }
     } catch (error: any) {
-      // Limpiar tokens inválidos
       console.log(error);
       authService.logout();
     } finally {
@@ -46,21 +45,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const login = async (credentials: LoginData) => {
-
-    const { user: userData} = await authService.login(credentials);
+    await authService.login(credentials);
+    const userData = await authService.getUser();
     setUser(userData);
   };
 
   const register = async (userData: RegisterData) => {
-    console.log(userData);
-
-    const { user } = await authService.register(userData);
+    await authService.register(userData);
+    const user = await authService.getUser();
     setUser(user);
   };
 
   const logout = () => {
     authService.logout();
     setUser(null);
+    navigate("/login", { replace: true });
   };
 
   const hasRole = (roles: UserRole | UserRole[]): boolean => {
@@ -70,9 +69,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const getRole = (): UserRole | null => {
-    const rol = authService.getUserRole()
-    return rol
-  }
+    const rol = authService.getUserRole();
+    return rol;
+  };
 
   const value = {
     user,
@@ -82,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     logout,
     loading,
     hasRole,
-    getRole
+    getRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

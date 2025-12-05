@@ -15,7 +15,8 @@ class DashboardController extends Controller
     {
         try {
             $user = $request->user();
-            
+            $anio = $request->input('anio', date('Y'));
+            $mes = $request->input('mes', date('m'));
             if (!$user) {
                 return response()->json([
                     'success' => false,
@@ -23,61 +24,27 @@ class DashboardController extends Controller
                 ], 401);
             }
 
-            $empleadoId = $user->idUsuario;
-
-            // Estadísticas del día
-            $ventasHoy = Venta::where('idEmpleado', $empleadoId)
-                ->whereDate('fecha', today())
-                ->get();
-
-            $movimientosHoy = MovimientoInventario::where('idEmpleado', $empleadoId)
-                ->whereDate('fechaMovimiento', today())
-                ->get();
-
-            // Últimas ventas del empleado
-            $ultimasVentas = Venta::with(['cliente.persona', 'detalleVentas.producto'])
-                ->where('idEmpleado', $empleadoId)
-                ->latest()
-                ->limit(5)
-                ->get();
-
-            // Productos con stock bajo
-            $stockBajo = Producto::with('categoria')
-                ->stockBajo()
-                ->activos()
-                ->orderBy('stock')
-                ->limit(5)
-                ->get();
-
-            // Últimos movimientos del empleado
-            $ultimosMovimientos = MovimientoInventario::with('producto')
-                ->where('idEmpleado', $empleadoId)
-                ->latest()
-                ->limit(5)
-                ->get();
-
-            // Ventas del mes actual
-            $ventasMes = Venta::where('idEmpleado', $empleadoId)
-                ->whereMonth('fecha', now()->month)
-                ->whereYear('fecha', now()->year)
-                ->get();
-
-            $estadisticas = [
-                'ventas_hoy' => $ventasHoy->count(),
-                'monto_ventas_hoy' => $ventasHoy->sum('montoTotal'),
-                'movimientos_hoy' => $movimientosHoy->count(),
-                'productos_stock_bajo' => $stockBajo->count(),
-                'ventas_mes' => $ventasMes->count(),
-                'monto_ventas_mes' => $ventasMes->sum('montoTotal')
-            ];
+        $empleadoId = $request->input('iduser');
+        $ventas = DB::select('CALL sp_contar_ventas_empleado(?, ?, ?)', [$empleadoId, $anio, $mes]);
+        $totalVendido = DB::select('CALL sp_total_vendido_empleado(?, ?, ?)', [$empleadoId, $anio, $mes]);
+        $clientes = DB::select('CALL sp_contar_clientes_empleado(?, ?, ?)', [$empleadoId, $anio, $mes]);
+        $productoMasVendido = DB::select('CALL sp_producto_mas_vendido_empleado(?, ?, ?)', [$empleadoId, $anio, $mes]);
+        $ventasPorMes = DB::select('CALL sp_ventas_por_mes_empleado(?, ?)', [$empleadoId, $anio]);
+        $ventasPorProducto = DB::select('CALL sp_ventas_por_producto_empleado(?, ?, ?)', [$empleadoId, $anio, $mes]);
+        $ventas2024 = DB::select('CALL sp_ventas_totales_por_mes_2024(?)', [$anio]);
+        $ventas2024ConCantidades = DB::select('CALL sp_ventas_totales_con_cantidades_2024(?)', [$anio]);
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'estadisticas' => $estadisticas,
-                    'ultimas_ventas' => $ultimasVentas,
-                    'stock_bajo' => $stockBajo,
-                    'ultimos_movimientos' => $ultimosMovimientos
+                    'ventas' => $ventas[0]->total_ventas ?? 0,
+                    'total_vendido' => $totalVendido[0]->monto_total ?? 0,
+                    'clientes' => $clientes[0]->total_clientes ?? 0,
+                    'producto_mas_vendido' => $productoMasVendido[0] ?? null,
+                    'ventas_por_mes' => $ventasPorMes,
+                    'ventas_por_producto' => $ventasPorProducto,
+                    'ventas_2024' => $ventas2024,
+                    'ventas_2024_con_cantidades' => $ventas2024ConCantidades,
                 ]
             ], 200);
 

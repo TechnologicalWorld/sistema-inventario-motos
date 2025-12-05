@@ -12,74 +12,38 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            // Estadísticas generales
-            $estadisticas = [
-                'ventas_hoy' => Venta::whereDate('fecha', today())->count(),
-                'ventas_mes' => Venta::whereMonth('fecha', now()->month)->count(),
-                'compras_mes' => Compra::whereMonth('fecha', now()->month)->count(),
-                'clientes_totales' => Cliente::count(),
-                'productos_stock_bajo' => Producto::stockBajo()->count(),
-            ];
+            $anio=$request->input('anio', date('Y'));
+            $mes=$request->input('mes', date('m'));
+            
+            $ventasPorCategoria = DB::select('CALL sp_ventas_por_categoria(?, ?)', [$anio, $mes]);
+            $productosSinVenta = DB::select('CALL sp_productos_sin_venta_mes(?, ?)', [$anio, $mes]);
+            $movimientosInventario = DB::select('CALL sp_movimientos_inventario_mes(?, ?)', [$anio, $mes]);
+            $comprasPorProducto = DB::select('CALL sp_compras_por_producto(?, ?)', [$anio, $mes]);
+            $gastoTotalMes = DB::select('CALL sp_gasto_total_mes(?, ?)', [$anio, $mes]);
+            $totalVentasMes = DB::select('CALL sp_total_ventas_mes(?, ?)', [$anio, $mes]);
+            $nroVentasMes = DB::select('CALL sp_nro_ventas_mes(?, ?)', [$anio, $mes]);
+            $nroEmpresasProvedoras = DB::select('CALL sp_nro_empresas_proveedoras()');
+            $cantidadProductosActivos = DB::select('CALL sp_cantidad_productos_activos()');
+            $cantidadProductosInactivos = DB::select('CALL sp_cantidad_productos_inactivos()');
 
-            // Gráfica de ventas vs compras (últimos 7 días)
-            $ventasCompras = DB::table('venta')
-                ->select(DB::raw('DATE(fecha) as fecha, COUNT(*) as ventas, 0 as compras'))
-                ->whereDate('fecha', '>=', now()->subDays(7))
-                ->groupBy('fecha')
-                ->unionAll(
-                    DB::table('compra')
-                        ->select(DB::raw('DATE(fecha) as fecha, 0 as ventas, COUNT(*) as compras'))
-                        ->whereDate('fecha', '>=', now()->subDays(7))
-                        ->groupBy('fecha')
-                )
-                ->get()
-                ->groupBy('fecha')
-                ->map(function ($items) {
-                    return [
-                        'ventas' => $items->sum('ventas'),
-                        'compras' => $items->sum('compras')
-                    ];
-                });
-
-            // Productos con stock mínimo
-            $stockMinimo = Producto::with('categoria')
-                ->stockBajo()
-                ->orderBy('stock')
-                ->limit(10)
-                ->get();
-
-            // Top productos más vendidos
-            $topProductos = DB::table('detalle_venta')
-                ->join('producto', 'detalle_venta.idProducto', '=', 'producto.idProducto')
-                ->select('producto.nombre', DB::raw('SUM(detalle_venta.cantidad) as total_vendido'))
-                ->groupBy('producto.idProducto', 'producto.nombre')
-                ->orderBy('total_vendido', 'desc')
-                ->limit(10)
-                ->get();
-
-            // Clientes frecuentes
-            $clientesFrecuentes = DB::table('venta')
-                ->join('cliente', 'venta.idCliente', '=', 'cliente.idCliente')
-                ->join('persona', 'cliente.idCliente', '=', 'persona.idPersona')
-                ->select('persona.nombres', 'persona.paterno', 'persona.materno', 
-                         DB::raw('COUNT(venta.idVenta) as total_compras'),
-                         DB::raw('SUM(venta.montoTotal) as monto_total'))
-                ->groupBy('cliente.idCliente', 'persona.nombres', 'persona.paterno', 'persona.materno')
-                ->orderBy('total_compras', 'desc')
-                ->limit(10)
-                ->get();
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'estadisticas' => $estadisticas,
-                    'ventas_compras' => $ventasCompras,
-                    'stock_minimo' => $stockMinimo,
-                    'top_productos' => $topProductos,
-                    'clientes_frecuentes' => $clientesFrecuentes
+                    'ventas_por_categoria' => $ventasPorCategoria,
+                    'productos_sin_venta' => $productosSinVenta,
+                    'movimientos_inventario' => $movimientosInventario,
+                    'compras_por_producto' => $comprasPorProducto,
+                    'gasto_total_mes' => $gastoTotalMes,
+                    'total_ventas_mes' => $totalVentasMes,
+                    'nro_ventas_mes' => $nroVentasMes,
+                    'nro_empresas_provedoras' => $nroEmpresasProvedoras,
+                    'cantidad_productos_activos' => $cantidadProductosActivos,
+                    'cantidad_productos_inactivos' => $cantidadProductosInactivos,
+                    
                 ]
             ], 200);
 

@@ -207,12 +207,17 @@ const propietarioMenu: MenuItem[] = [
     children: [
       {
         label: "Productos",
-        to: "/propietario/productos",
+        to: "/propietario/inventario/productos",
         icon: <FiBox className="text-sm" />,
       },
       {
         label: "Categorías",
-        to: "/categorias",
+        to: "/propietario/inventario/categorias",
+        icon: <FiPackage className="text-sm" />,
+      },
+      {
+        label: "Movimientos",
+        to: "/propietario/inventario/movimientos",
         icon: <FiPackage className="text-sm" />,
       },
     ],
@@ -238,18 +243,7 @@ const propietarioMenu: MenuItem[] = [
     id: "prop-reportes",
     label: "Reportes",
     icon: <FiBarChart2 className="text-lg" />,
-    children: [
-      {
-        label: "Ventas",
-        to: "/reportes/ventas",
-        icon: <FiBarChart2 className="text-sm" />,
-      },
-      {
-        label: "Compras",
-        to: "/reportes/compras",
-        icon: <FiShoppingBag className="text-sm" />,
-      },
-    ],
+    to: "/propietario/reportes",
   },
 ];
 
@@ -322,23 +316,7 @@ const gerenteMenu: MenuItem[] = [
     id: "ger-reportes",
     label: "Reportes",
     icon: <FiFileText className="text-lg" />,
-    children: [
-      {
-        label: "Ventas",
-        to: "/gerente/reportes/ventas",
-        icon: <FiBarChart2 className="text-sm" />,
-      },
-      {
-        label: "Compras",
-        to: "/gerente/reportes/compras",
-        icon: <FiShoppingBag className="text-sm" />,
-      },
-      {
-        label: "Inventario",
-        to: "/gerente/reportes/inventario",
-        icon: <FiPackage className="text-sm" />,
-      },
-    ],
+    to: "/gerente/reportes",
   },
 ];
 
@@ -367,12 +345,7 @@ const empleadoMenu: MenuItem[] = [
     icon: <FiUsers className="text-lg" />,
     to: "/empleado/clientes",
   },
-  {
-    id: "emp-compras",
-    label: "Compras",
-    icon: <FiShoppingBag className="text-lg" />,
-    to: "/empleado/compras",
-  },
+
   {
     id: "emp-movimientos",
     label: "Movimientos",
@@ -383,7 +356,7 @@ const empleadoMenu: MenuItem[] = [
     id: "emp-departamento",
     label: "Departamento",
     icon: <FiBriefcase className="text-lg" />,
-    to: "/empleado/departamento",
+    to: "/empleado/mi-departamento",
   },
 ];
 
@@ -416,7 +389,7 @@ function CollapsedParentItem({ item }: { item: MenuItem }) {
     if (!open && btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
 
-      const OFFSET = 65; 
+      const OFFSET = 65;
       const newTop = Math.max(8, rect.top - OFFSET);
 
       setTop(newTop);
@@ -467,7 +440,6 @@ function CollapsedParentItem({ item }: { item: MenuItem }) {
     </>
   );
 }
-
 
 // -------------------- Sidebar principal --------------------
 

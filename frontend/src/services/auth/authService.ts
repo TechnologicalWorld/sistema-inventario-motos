@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { User, UserRole } from "../../types/auth";
 import api from "../api";
 import type { AuthResponse, LoginData, RegisterData } from "../types/auth";
@@ -15,7 +14,19 @@ export const authService = {
       localStorage.setItem("token", token);
       localStorage.setItem("userRole", role);
 
-      window.location.href = "/perfil";
+      switch (role) {
+        case "gerente":
+          window.location.href = "/gerente/dashboard";
+          break;
+        case "empleado":
+          window.location.href = "/empleado/dashboard";
+          break;
+        case "propietario":
+          window.location.href = "/propietario/dashboard";
+          break;
+        default:
+          window.location.href = "/";
+      }
 
       return response.data;
     } catch (error: any) {
@@ -35,9 +46,21 @@ export const authService = {
       localStorage.setItem("token", token);
       localStorage.setItem("userRole", role);
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      alert("Token guardado después del registro");
 
-      window.location.href = "/login";
+      switch (role) {
+        case "gerente":
+          window.location.href = "/gerente/dashboard";
+          break;
+        case "empleado":
+          window.location.href = "/empleado/dashboard";
+          break;
+        case "propietario":
+          window.location.href = "/propietario/dashboard";
+          break;
+        default:
+          window.location.href = "/";
+      }
+
       return response.data;
     } catch (error: any) {
       if (error.response?.data?.errors) {

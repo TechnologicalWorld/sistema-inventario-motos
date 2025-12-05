@@ -1,4 +1,5 @@
 import React from "react";
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import { useCompraDetalle } from "../hooks/useCompraDetalle";
 import { DetalleCompra } from "../compras.service";
 
@@ -26,6 +27,201 @@ function formatBs(value: string | number) {
   const num = Number(value || 0);
   return `Bs. ${num.toFixed(2)}`;
 }
+
+// Estilos para el PDF
+const styles = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontSize: 10,
+    fontFamily: 'Helvetica',
+    backgroundColor: '#ffffff',
+  },
+  header: {
+    marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 2,
+    borderBottomColor: '#333',
+    borderBottomStyle: 'solid',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  infoBox: {
+    backgroundColor: '#f5f5f5',
+    padding: 15,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderStyle: 'solid',
+    marginBottom: 20,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  label: {
+    fontWeight: 'bold',
+    marginRight: 5,
+    minWidth: 90,
+  },
+  value: {
+    flex: 1,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: 15,
+    marginBottom: 10,
+    color: '#374151',
+  },
+  table: {
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderStyle: 'solid',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#d1d5db',
+    padding: 10,
+    fontWeight: 'bold',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+    borderBottomStyle: 'solid',
+  },
+  tableRowAlt: {
+    backgroundColor: '#f9fafb',
+  },
+  col1: { width: '40%', paddingRight: 10 },
+  col2: { width: '20%', textAlign: 'left' },
+  col3: { width: '20%', textAlign: 'left' },
+  col4: { width: '20%', textAlign: 'left' },
+  summaryBox: {
+    marginTop: 20,
+    alignSelf: 'flex-end',
+    width: '45%',
+    backgroundColor: '#f5f5f5',
+    padding: 15,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderStyle: 'solid',
+  },
+  summaryTitle: {
+    fontWeight: 'bold',
+    fontSize: 11,
+    marginBottom: 10,
+    color: '#374151',
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  summaryTotal: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#6b7280',
+    borderTopStyle: 'solid',
+    fontWeight: 'bold',
+  },
+});
+
+// Componente PDF
+const CompraPDF: React.FC<{ data: any }> = ({ data }) => {
+  const detalles: DetalleCompra[] = data?.detalle_compras ?? [];
+  const totalItems = detalles.length;
+  const totalUnidades = detalles.reduce((acc, d) => acc + (d.cantidad || 0), 0);
+  const totalPago = Number(data?.totalPago || 0);
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            DETALLE DE COMPRA / {formatIdCompra(data.idCompra)}
+          </Text>
+        </View>
+
+        {/* Información principal */}
+        <View style={styles.infoBox}>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Fecha:</Text>
+            <Text style={styles.value}>{formatFecha(data.fecha)}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Proveedor:</Text>
+            <Text style={styles.value}>{data.empresa_proveedora?.nombre ?? "-"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Gerente:</Text>
+            <Text style={styles.value}>
+              {data.gerente?.persona
+                ? `${data.gerente.persona.nombres} ${data.gerente.persona.paterno}`
+                : "-"}
+            </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Observación:</Text>
+            <Text style={styles.value}>{data.observacion || "-"}</Text>
+          </View>
+        </View>
+
+        {/* Detalle de compra */}
+        <Text style={styles.sectionTitle}>Detalle de Compra</Text>
+        <View style={styles.table}>
+          <View style={styles.tableHeader}>
+            <Text style={styles.col1}>Producto</Text>
+            <Text style={styles.col2}>Precio Unitario</Text>
+            <Text style={styles.col3}>Cantidad</Text>
+            <Text style={styles.col4}>Subtotal</Text>
+          </View>
+          {detalles.map((d, idx) => (
+            <View
+              key={d.idDetalleCompra}
+              style={[styles.tableRow, idx % 2 === 1 && styles.tableRowAlt]}
+            >
+              <Text style={styles.col1}>{d.producto?.nombre ?? "-"}</Text>
+              <Text style={styles.col2}>{formatBs(d.precioUnitario)}</Text>
+              <Text style={styles.col3}>{d.cantidad}</Text>
+              <Text style={styles.col4}>{formatBs(d.subTotal)}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Resumen */}
+        <View style={styles.summaryBox}>
+          <Text style={styles.summaryTitle}>Resumen de Compra</Text>
+          <View style={styles.summaryRow}>
+            <Text>Total ítems:</Text>
+            <Text>{totalItems}</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text>Total unidades:</Text>
+            <Text>{totalUnidades}</Text>
+          </View>
+          <View style={styles.summaryTotal}>
+            <Text>Total pago:</Text>
+            <Text>{formatBs(totalPago)}</Text>
+          </View>
+        </View>
+      </Page>
+    </Document>
+  );
+};
 
 const CompraDetalleModal: React.FC<Props> = ({ compraId, open, onClose }) => {
   const { data, loading, error } = useCompraDetalle(compraId, open);
@@ -176,7 +372,16 @@ const CompraDetalleModal: React.FC<Props> = ({ compraId, open, onClose }) => {
         </div>
 
         {/* FOOTER */}
-        <div className="px-6 py-3 flex justify-center">
+        <div className="px-6 py-3 flex justify-center gap-3">
+          {!loading && !error && data && (
+            <PDFDownloadLink
+              document={<CompraPDF data={data} />}
+              fileName={`compra-${formatIdCompra(data.idCompra)}.pdf`}
+              className="px-6 py-2 rounded-sm bg-blue-600 text-white text-sm hover:bg-blue-700 transition-colors"
+            >
+              {({ loading }) => (loading ? 'Preparando PDF...' : 'Descargar PDF')}
+            </PDFDownloadLink>
+          )}
           <button
             onClick={onClose}
             className="px-6 py-2 rounded-sm bg-gray-600 text-white text-sm hover:bg-gray-700"

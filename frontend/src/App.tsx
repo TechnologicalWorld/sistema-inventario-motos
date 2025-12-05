@@ -10,7 +10,7 @@ import { Unauthorized } from "./pages/auth/Unauthorized";
 // Layout
 import DashboardLayout from "./components/layout/Layout";
 import { Perfil } from "./services/shared/Perfil";
-import DashboardPropietario from "./pages/propietario/dashboard/pages/DashboardPropietario";
+
 // ========================
 // GERENTE - Inventarios
 // ========================
@@ -23,11 +23,32 @@ import ComprasPage from "./pages/gerente/compras/pages/ComprasPage";
 import ProveedoresPage from "./pages/gerente/proveedores/pages/ProveedoresPage";
 import EmpleadosPage from "./pages/gerente/empleados/pages/EmpleadosPage";
 import DepartamentosPage from "./pages/gerente/departamentos/pages/DepartamentosPage";
+import DashboardGerente from "./pages/gerente/dashboard/DashboardGerente";
+import ReportesGerente from "./pages/gerente/reportes/ReportesGerente";
+// ========================
+// PROPIETARIO
+// ========================
+import ReportesPropietario from "./pages/propietario/reportes/ReportesPropietario";
+import ProductosPagePropietario from "./pages/propietario/inventario/productos/pages/ProductoPage";
+import CategoriasPagePropietario from "./pages/propietario/inventario/categorias/pages/CategoriaPage";
+import MovimientosPagePropietario from "./pages/propietario/inventario/movimientos/pages/MovimientosPage";
+import DashboardPropietario from "./pages/propietario/dashboard/pages/DashboardPropietario";
 import ClientesPagePro from "./pages/propietario/clientes/pages/ClientesPagePro";
 import EmpresaPagePro from "./pages/propietario/empresa/pages/EmpresaPagePro";
 import ProveedoresPagePro from "./pages/propietario/proveedores/pages/ProveedoresPagePro";
 import ComprasPagePro from "./pages/propietario/compras/pages/ComprasPagePro";
 import VentasPagePro from "./pages/propietario/ventas/pages/VentasPagePro";
+
+// ========================
+// EMPLEADO
+// ========================
+import DashboardEmpleado from "./pages/empleado/dashboard/DashboardEmpleado";
+import EmpleadoClientesPage from "./pages/empleado/clientes/pages/ClientesPage";
+import EmpleadoInventarioPage from "./pages/empleado/inventario/pages/InventarioPage";
+import EmpleadoVentaPage from "./pages/empleado/ventas/pages/VentasPage";
+import EmpleadoMovimientosPage from "./pages/empleado/movimientos/pages/MovimientosPage";
+import MiDepartamentoPage from "./pages/empleado/departamentos/pages/MiDepartamentoPage";
+
 /**
  * Dashboards temporales por rol
  */
@@ -40,12 +61,6 @@ const GerenteDashboard = () => (
 const EmpleadoDashboard = () => (
   <div className="p-4">
     <h1 className="text-xl font-semibold">Dashboard EMPLEADO</h1>
-  </div>
-);
-
-const PropietarioDashboard = () => (
-  <div className="p-4">
-    <h1 className="text-xl font-semibold">Dashboard PROPIETARIO</h1>
   </div>
 );
 
@@ -101,12 +116,25 @@ function App() {
         {/* RUTAS PARA ROL: GERENTE        */}
         {/* Prefix: /gerente/...           */}
         {/* ============================== */}
-        <Route path="gerente/dashboard" element={<GerenteDashboard />} />
+        <Route path="gerente/dashboard" element={<DashboardGerente />} />
+        <Route
+          path="gerente/reportes"
+          element={<ReportesGerente />}
+        />
 
         {/* Inventarios - Gerente */}
-        <Route path="gerente/inventarios/productos" element={<ProductosPage />}/>
-        <Route path="gerente/inventarios/categorias" element={<CategoriasPage />}/>
-        <Route path="gerente/inventarios/movimientos" element={<MovimientosPage />}/>
+        <Route
+          path="gerente/inventarios/productos"
+          element={<ProductosPage />}
+        />
+        <Route
+          path="gerente/inventarios/categorias"
+          element={<CategoriasPage />}
+        />
+        <Route
+          path="gerente/inventarios/movimientos"
+          element={<MovimientosPage />}
+        />
 
         {/* Ventas - Gerente */}
         <Route path="gerente/ventas" element={<VentasPage />} />
@@ -130,18 +158,59 @@ function App() {
         {/* RUTAS PARA ROL: EMPLEADO       */}
         {/* Prefix: /empleado/...          */}
         {/* ============================== */}
-        <Route path="empleado/dashboard" element={<EmpleadoDashboard />} />
+        <Route path="empleado/dashboard" element={<DashboardEmpleado />} />
+
+        <Route path="empleado/clientes" element={<EmpleadoClientesPage />} />
+        <Route
+          path="empleado/inventario"
+          element={<EmpleadoInventarioPage />}
+        />
+        <Route path="empleado/ventas" element={<EmpleadoVentaPage />} />
+        <Route
+          path="empleado/movimientos"
+          element={<EmpleadoMovimientosPage />}
+        />
+        <Route
+          path="empleado/mi-departamento"
+          element={<MiDepartamentoPage />}
+        />
 
         {/* ============================== */}
         {/* RUTAS PARA ROL: PROPIETARIO    */}
         {/* Prefix: /propietario/...       */}
         {/* ============================== */}
-        <Route path="propietario/dashboard" element={<DashboardPropietario />}/>
-        <Route path="propietario/empresa" element={<EmpresaPagePro />}/>
-        <Route path="propietario/proveedores" element={<ProveedoresPagePro/>}/>
-        <Route path="propietario/clientes" element={<ClientesPagePro/>}/>
-        <Route path="propietario/compras" element={<ComprasPagePro/>}/>
-        <Route path="propietario/ventas" element={<VentasPagePro/>}/>
+        <Route
+          path="propietario/dashboard"
+          element={<DashboardPropietario />}
+        />
+        <Route
+          path="propietario/reportes"
+          element={<ReportesPropietario />}
+        />
+        <Route path="propietario/empresa" element={<EmpresaPagePro />} />
+        <Route
+          path="propietario/proveedores"
+          element={<ProveedoresPagePro />}
+        />
+        <Route path="propietario/clientes" element={<ClientesPagePro />} />
+
+        {/* Inventarios - Propietario */}
+        <Route
+          path="propietario/inventario/productos"
+          element={<ProductosPagePropietario />}
+        />
+        <Route
+          path="propietario/inventario/categorias"
+          element={<CategoriasPagePropietario />}
+        />
+
+        <Route
+          path="propietario/inventario/movimientos"
+          element={<MovimientosPagePropietario />}
+        />
+
+        <Route path="propietario/compras" element={<ComprasPagePro />} />
+        <Route path="propietario/ventas" element={<VentasPagePro />} />
         {/* ===================================================== */}
         {/* Ruta por defecto dentro del layout protegido          */}
         {/* Si entras a /gerente, /empleado, etc sin path final,  */}

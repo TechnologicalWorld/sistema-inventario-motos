@@ -138,7 +138,7 @@ export async function getCompras(params: {
   if (filters.proveedor) queryParams.proveedor = filters.proveedor;
   if (filters.fecha_inicio) queryParams.fecha_inicio = filters.fecha_inicio;
   if (filters.fecha_fin) queryParams.fecha_fin = filters.fecha_fin;
-  if (filters.search) queryParams.search = filters.search; // el backend lo puede ignorar si aún no lo implementaste
+  if (filters.search) queryParams.search = filters.search;
 
   const res = await api.get("/gerente/compras", { params: queryParams });
   const json = res.data;
