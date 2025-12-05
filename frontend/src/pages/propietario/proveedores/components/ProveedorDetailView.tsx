@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { FiChevronLeft, FiChevronRight, FiEye } from "react-icons/fi";
 import type { Proveedor } from "../proveedores.service";
-import { useProveedorHistorial } from "../hooks/useProveedorHistorial";
+import { useProveedorCompras } from "../hooks/useProveedorCompras";
 import CompraDetalleModal from "../../compras/components/CompraDetalleModal";
 
 interface Props {
@@ -29,7 +29,7 @@ const ProveedorDetailView: React.FC<Props> = ({
   onAnteriorProveedor,
   onSiguienteProveedor,
 }) => {
-  const { data, loading, error } = useProveedorHistorial(
+  const { data, resumen, loading, error } = useProveedorCompras(
     proveedor.idEmpresaP
   );
 
@@ -38,35 +38,7 @@ const ProveedorDetailView: React.FC<Props> = ({
   const [compraIdSeleccionada, setCompraIdSeleccionada] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const compras = data?.proveedor?.compras ?? [];
-
-
-  const resumen = useMemo(() => {
-  if (!compras.length) {
-    return {
-      totalComprado: 0,
-      ticketPromedio: 0,
-      numeroCompras: 0,
-      ultimaCompra: null,
-    };
-  }
-
-  const total = compras.reduce((sum, c) => sum + Number(c.totalPago), 0);
-
-  const ultima = compras
-    .map((c) => c.fecha)
-    .sort()
-    .reverse()[0];
-
-  return {
-    totalComprado: total,
-    ticketPromedio: total / compras.length,
-    numeroCompras: compras.length,
-    ultimaCompra: ultima,
-  };
-}, [compras]);
-
-
+  const compras = data?.compras ?? [];
 
   const comprasPaginadas = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
@@ -144,7 +116,7 @@ const ProveedorDetailView: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Historial de comprass*/}
+      {/* Historial de compras */}
       <h2 className="text-base md:text-lg font-semibold mb-2">
         Historial de compras
       </h2>
