@@ -29,10 +29,6 @@ const EmpresaInfoCard: React.FC<Props> = ({ empresa, onEditClick }) => {
                 <FaPhoneAlt className="text-gray-500" />
                 <span>{empresa.telefono}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <FaRegEnvelope className="text-gray-500" />
-                <span>{empresa.logo || "LOGOEMPRESARIAL"}</span>
-              </div>
             </div>
           </div>
           <div className="flex-1 space-y-4">

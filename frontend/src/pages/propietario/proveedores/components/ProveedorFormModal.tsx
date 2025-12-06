@@ -124,7 +124,7 @@ const ProveedorFormModal: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* FOOTER */}
+        {/* boton */}
         <div className="px-6 py-3 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-start">
           <button
             type="submit"

@@ -40,6 +40,34 @@ const ProveedorDetailView: React.FC<Props> = ({
 
   const compras = data?.compras ?? [];
 
+  // Normalizar/respaldo de resumen: usar `resumen` si existe, si no calcularlo
+  // a partir de `data.compras` (respuesta del hook) o `proveedor` (si incluye compras o campos agregados).
+  const comprasSource = data?.compras ?? proveedor.compras ?? [];
+
+  const numeroComprasFallback = comprasSource.length ?? (proveedor.compras_count ?? 0);
+
+  const totalCompradoFallback = comprasSource.reduce((sum: number, c: any) => {
+    const v = parseFloat(c.totalPago ?? c.total_pago ?? c.total ?? 0);
+    return sum + (isNaN(v) ? 0 : v);
+  }, 0) || Number(proveedor.total_comprado ?? 0);
+
+  const ultimaCompraFallback = comprasSource.length
+    ? comprasSource
+        .map((c: any) => c.fecha ?? c.fecha_compra ?? c.created_at)
+        .filter(Boolean)
+        .sort((a: string, b: string) => b.localeCompare(a))[0]
+    : proveedor.ultima_compra ?? null;
+
+  const resumenFinal = resumen ?? {
+    numeroCompras: numeroComprasFallback,
+    totalComprado: totalCompradoFallback,
+    ticketPromedio:
+      numeroComprasFallback > 0
+        ? totalCompradoFallback / numeroComprasFallback
+        : 0,
+    ultimaCompra: ultimaCompraFallback ?? null,
+  };
+
   const comprasPaginadas = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
     return compras.slice(start, start + PAGE_SIZE);
@@ -91,12 +119,12 @@ const ProveedorDetailView: React.FC<Props> = ({
         <div className="bg-[#f0e7e2] border border-gray-300 rounded-md p-3">
           <div className="font-semibold mb-1">Total comprado (Bs.)</div>
           <div className="text-lg font-semibold">
-            Bs. {resumen ? resumen.totalComprado.toFixed(2) : "0.00"}
+            Bs. {resumenFinal && typeof resumenFinal.totalComprado === 'number' ? resumenFinal.totalComprado.toFixed(2) : (Number(resumenFinal.totalComprado || 0)).toFixed(2)}
           </div>
           <div className="mt-2 flex justify-between">
             <span className="font-semibold">Ticket promedio</span>
             <span>
-              Bs. {resumen ? resumen.ticketPromedio.toFixed(2) : "0.00"}
+              Bs. {resumenFinal ? resumenFinal.ticketPromedio.toFixed(2) : "0.00"}
             </span>
           </div>
         </div>
@@ -106,12 +134,12 @@ const ProveedorDetailView: React.FC<Props> = ({
           <div>
             <div className="font-semibold mb-1">Nº compras</div>
             <div className="text-lg font-semibold">
-              {resumen?.numeroCompras ?? 0}
+              {resumenFinal?.numeroCompras ?? 0}
             </div>
           </div>
           <div>
             <div className="font-semibold mb-1">Última compra</div>
-            <div>{resumen ? formatFecha(resumen.ultimaCompra) : "-"}</div>
+            <div>{resumenFinal ? formatFecha(resumenFinal.ultimaCompra) : "-"}</div>
           </div>
         </div>
       </div>
@@ -189,14 +217,14 @@ const ProveedorDetailView: React.FC<Props> = ({
         </table>
 
         {/* Paginación interna de compras */}
-        {compras.length > 0 && (
+        {/*{compras.length > 0 && (
           <div className="flex items-center justify-center gap-4 px-4 py-3">
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               className="px-4 py-1.5 rounded-md bg-[#c0163b] text-white text-sm hover:bg-[#a41333] disabled:opacity-50"
             >
-              Anterior
+              Anteriorsdaaa
             </button>
             <span className="text-sm text-gray-700">
               Página {page} de {totalPages}
@@ -206,10 +234,11 @@ const ProveedorDetailView: React.FC<Props> = ({
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               className="px-4 py-1.5 rounded-md bg-[#c0163b] text-white text-sm hover:bg-[#a41333] disabled:opacity-50"
             >
-              Siguiente
+              Siguiente saaa
             </button>
           </div>
-        )}
+        )}*/}
+
       </div>
 
       {/* Navegación inferior */}

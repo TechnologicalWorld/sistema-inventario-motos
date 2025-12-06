@@ -38,7 +38,8 @@ import EmpresaPagePro from "./pages/propietario/empresa/pages/EmpresaPagePro";
 import ProveedoresPagePro from "./pages/propietario/proveedores/pages/ProveedoresPagePro";
 import ComprasPagePro from "./pages/propietario/compras/pages/ComprasPagePro";
 import VentasPagePro from "./pages/propietario/ventas/pages/VentasPagePro";
-
+import EmpleadosPagePro from "./pages/propietario/empleados/pages/EmpleadosPagePro";
+import EmpleadoDetailPage from "./pages/propietario/empleados/pages/EmpleadoDetailPage";
 // ========================
 // EMPLEADO
 // ========================
@@ -193,6 +194,8 @@ function App() {
           element={<ProveedoresPagePro />}
         />
         <Route path="propietario/clientes" element={<ClientesPagePro />} />
+        <Route path="propietario/empleados" element={<EmpleadosPagePro />} />
+        <Route path="propietario/empleados/:idEmpleado" element={<EmpleadoDetailPage />} />
 
         {/* Inventarios - Propietario */}
         <Route
