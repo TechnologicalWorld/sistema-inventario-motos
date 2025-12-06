@@ -153,12 +153,6 @@ const ComprasPage: React.FC = () => {
             </div>
 
             {/* LADO DERECHO: botón Agregar Compra */}
-            <button
-              onClick={() => setView("create")}
-              className="px-4 py-2 rounded-full bg-blue-700 text-white text-sm hover:bg-blue-800"
-            >
-              Agregar Compra
-            </button>
           </div>
 
           {/* Tabla */}

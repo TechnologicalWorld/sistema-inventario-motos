@@ -177,12 +177,12 @@ const ProveedoresPage: React.FC = () => {
           </button>
         </div>
 
-        <button
+        {/*<button
           onClick={handleAbrirNuevo}
           className="px-4 py-2 rounded-full bg-[#1d6fe9] text-white text-sm hover:bg-[#1556b4]"
         >
           Agregar Proveedor
-        </button>
+        </button>*/}
       </div>
 
       {/* Tabla */}

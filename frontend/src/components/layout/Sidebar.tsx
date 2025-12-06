@@ -198,6 +198,11 @@ const propietarioMenu: MenuItem[] = [
         to: "/propietario/clientes",
         icon: <FiUsers className="text-sm" />,
       },
+      {
+        label: "Empleados",
+        to: "/propietario/empleados",
+        icon: <FiUsers className="text-sm" />,
+      },
     ],
   },
   {

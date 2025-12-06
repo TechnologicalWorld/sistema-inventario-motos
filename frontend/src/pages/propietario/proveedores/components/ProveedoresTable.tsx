@@ -1,5 +1,6 @@
 import React from "react";
-import { FiEye, FiEdit2, FiTrash, FiDownload } from "react-icons/fi";
+import { FiEye, FiEdit2, FiTrash, FiDownload ,  FiChevronLeft,
+  FiChevronRight,} from "react-icons/fi";
 import { Document, Page, Text, View, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import { Proveedor } from "../proveedores.service";
 
@@ -141,12 +142,21 @@ const ProveedoresReportePDF: React.FC<{ proveedores: Proveedor[] }> = ({ proveed
   // Calcular estadísticas
   const totalProveedores = proveedores.length;
   const proveedoresConCompras = proveedores.filter(p => (p.compras_count ?? 0) > 0).length;
-  const totalCompradoGeneral = proveedores.reduce(
-    (acc, p) => acc + Number(p.total_comprado || 0),
-    0
-  );
+  const totalCompradoGeneral = proveedores.reduce((acc, p) => {
+    // si backend trae total_comprado úsalo, sino sumar sobre compras
+    if (p.total_comprado != null) return acc + Number(p.total_comprado || 0);
+    const comprasArr = Array.isArray(p.compras) ? p.compras : [];
+    const sum = comprasArr.reduce((s, c: any) => {
+      const v = parseFloat(c.totalPago ?? c.total_pago ?? c.total ?? 0);
+      return s + (isNaN(v) ? 0 : v);
+    }, 0);
+    return acc + sum;
+  }, 0);
   const totalComprasGeneral = proveedores.reduce(
-    (acc, p) => acc + (p.compras_count ?? 0),
+    (acc, p) => {
+      if (p.compras_count != null) return acc + (p.compras_count ?? 0);
+      return acc + (Array.isArray(p.compras) ? p.compras.length : 0);
+    },
     0
   );
   const comprasPromedioPorProveedor = totalProveedores > 0 ? totalComprasGeneral / totalProveedores : 0;
@@ -179,10 +189,15 @@ const ProveedoresReportePDF: React.FC<{ proveedores: Proveedor[] }> = ({ proveed
           </View>
           {proveedores.map((proveedor, idx) => {
             const idFormateado = `P-${proveedor.idEmpresaP.toString().padStart(3, "0")}`;
-            const comprasCount = proveedor.compras_count ?? 0;
-            const totalComprado = proveedor.total_comprado 
-              ? Number(proveedor.total_comprado).toFixed(2)
-              : "0.00";
+            const comprasArr = Array.isArray(proveedor.compras) ? proveedor.compras : [];
+            const comprasCount = proveedor.compras_count != null ? proveedor.compras_count : comprasArr.length;
+            const totalCompradoNum = proveedor.total_comprado != null
+              ? Number(proveedor.total_comprado)
+              : comprasArr.reduce((s: number, c: any) => {
+                  const v = parseFloat(c.totalPago ?? c.total_pago ?? c.total ?? 0);
+                  return s + (isNaN(v) ? 0 : v);
+                }, 0);
+            const totalComprado = Number(totalCompradoNum).toFixed(2);
 
             return (
               <View
@@ -345,14 +360,22 @@ const ProveedoresTable: React.FC<Props> = ({
                   <td className="px-4 py-2">{p.contacto}</td>
                   <td className="px-4 py-2">{p.telefono}</td>
                   <td className="px-4 py-2">{p.direccion}</td>
-                  <td className="px-4 py-2 text-center">
-                    {p.compras_count ?? 0}
-                  </td>
-                  <td className="px-4 py-2">
-                    {p.total_comprado
-                      ? `Bs. ${Number(p.total_comprado).toFixed(2)}`
-                      : "—"}
-                  </td>
+                  {(() => {
+                    const comprasArr = Array.isArray(p.compras) ? p.compras : [];
+                    const comprasCount = p.compras_count != null ? p.compras_count : comprasArr.length;
+                    const totalCompradoNum = p.total_comprado != null
+                      ? Number(p.total_comprado)
+                      : comprasArr.reduce((s: number, c: any) => {
+                          const v = parseFloat(c.totalPago ?? c.total_pago ?? c.total ?? 0);
+                          return s + (isNaN(v) ? 0 : v);
+                        }, 0);
+                    return (
+                      <>
+                        <td className="px-4 py-2 text-center">{comprasCount}</td>
+                        <td className="px-4 py-2">{totalCompradoNum > 0 ? `Bs. ${totalCompradoNum.toFixed(2)}` : "—"}</td>
+                      </>
+                    );
+                  })()}
                   <td className="px-4 py-2">
                     <div className="flex items-center justify-center gap-2">
                       <button
@@ -362,48 +385,46 @@ const ProveedoresTable: React.FC<Props> = ({
                       >
                         <FiEye />
                       </button>
-                      <button
-                        onClick={() => onEditar(p)}
-                        className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs hover:bg-gray-800"
-                        title="Editar"
-                      >
-                        <FiEdit2 />
-                      </button>
-                      <button
-                        onClick={() => onEliminar(p)}
-                        className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs hover:bg-red-700"
-                        title="Eliminar"
-                      >
-                        <FiTrash />
-                      </button>
+                  
                     </div>
                   </td>
                 </tr>
               ))}
           </tbody>
         </table>
-
-        {/* Paginación */}
-        <div className="flex items-center justify-center gap-4 px-4 py-3">
+      </div>
+      {/* Paginación */}
+       <div className="mt-5 flex items-center justify-center gap-4">
           <button
             disabled={pagination.currentPage <= 1}
             onClick={() => onPageChange(pagination.currentPage - 1)}
-            className="px-4 py-1.5 rounded-md bg-[#c0163b] text-white text-sm hover:bg-[#a41333] disabled:opacity-50"
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 text-sm ${
+              pagination.currentPage <= 1
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-white text-gray-800 hover:bg-gray-100"
+            }`}
           >
-            Anterior
+            <FiChevronLeft />
+            <span>Anterior</span>
           </button>
+
           <span className="text-sm text-gray-700">
             Página {pagination.currentPage} de {pagination.lastPage}
           </span>
+
           <button
             disabled={pagination.currentPage >= pagination.lastPage}
             onClick={() => onPageChange(pagination.currentPage + 1)}
-            className="px-4 py-1.5 rounded-md bg-[#c0163b] text-white text-sm hover:bg-[#a41333] disabled:opacity-50"
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 text-sm ${
+              pagination.currentPage >= pagination.lastPage
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-white text-gray-800 hover:bg-gray-100"
+            }`}
           >
-            Siguiente
+            <span>Siguiente</span>
+            <FiChevronRight />
           </button>
         </div>
-      </div>
     </div>
   );
 };
