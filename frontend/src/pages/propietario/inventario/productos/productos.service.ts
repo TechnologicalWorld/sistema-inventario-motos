@@ -86,12 +86,12 @@ class ProductosService {
     id: number,
     payload: Omit<Producto, "idProducto" | "categoria">
   ) {
-    const response = await api.put(`${this.baseUrl}/${id}`, payload);
+    const response = await api.put(`${this.baseUrl}/productos/${id}`, payload);
     return response.data;
   }
 
   async deleteProducto(id: number) {
-    const response = await api.delete(`${this.baseUrl}/${id}`);
+    const response = await api.delete(`${this.baseUrl}/productos/${id}`);
     return response.data;
   }
 }

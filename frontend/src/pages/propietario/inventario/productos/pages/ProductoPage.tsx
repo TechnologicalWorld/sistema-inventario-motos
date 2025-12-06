@@ -90,7 +90,7 @@ export default function ProductosPage() {
         search: search || undefined,
         categoria: categoriaFiltro ? Number(categoriaFiltro) : undefined,
       });
-
+      
       setProductos(data.data);
       setPage(data.current_page);
       setLastPage(data.last_page);
