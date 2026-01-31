@@ -19,6 +19,7 @@ export interface Producto {
   estado: "activo" | "inactivo";
   idCategoria: number;
   categoria?: Categoria;
+  imagenUrl?: string;
 }
 
 export interface PaginationLink {
@@ -78,7 +79,7 @@ class ProductosService {
   }
 
   async createProducto(payload: Omit<Producto, "idProducto" | "categoria">) {
-    const response = await api.post(this.baseUrl, payload);
+    const response = await api.post(this.baseUrl+"/productos", payload);
     return response.data;
   }
 

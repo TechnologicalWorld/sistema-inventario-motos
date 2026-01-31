@@ -349,9 +349,10 @@ export default function ProductosPage() {
 
 
       {/* Tabla */}
-      <div className="bg-[#f3ebe7] border border-gray-300 rounded-md overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-300">
+<div className="relative w-full overflow-hidden">
+  {/* Scroll solo para la tabla */}
+  <div className="overflow-x-auto">
+    <table className="min-w-[1100px] w-full text-sm">          <thead className="bg-gray-300">
             <tr className="text-left">
               <th className="px-4 py-2 font-semibold">
                 Código
@@ -480,6 +481,7 @@ export default function ProductosPage() {
               })}
           </tbody>
         </table>
+      </div>
       </div>
 
       {/* Paginación */}

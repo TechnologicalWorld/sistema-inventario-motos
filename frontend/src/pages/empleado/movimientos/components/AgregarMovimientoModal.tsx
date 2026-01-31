@@ -271,7 +271,7 @@ const AgregarMovimientoModal: React.FC<Props> = ({
                 <div>
                   <span className="text-gray-600">Precio venta:</span>
                   <span className="ml-1 font-semibold">
-                    Bs. {productoSeleccionado.precioVenta.toFixed(2)}
+                    Bs. {parseFloat(productoSeleccionado.precioVenta).toFixed(2)}
                   </span>
                 </div>
                 <div>

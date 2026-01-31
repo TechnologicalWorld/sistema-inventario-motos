@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('stock')->default(0);
             $table->integer('stockMinimo')->default(0);
             $table->enum('estado', ['activo', 'inactivo'])->default('activo');
+            $table->string("imagenURL")->nullable();
             $table->foreignId('idCategoria')->constrained('categoria', 'idCategoria')->onDelete('cascade');
             $table->timestamps();
         });

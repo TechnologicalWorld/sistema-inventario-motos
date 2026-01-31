@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-
+use Illuminate\Support\Facades\Storage;
 
 class InventarioController extends Controller
 {
@@ -30,7 +30,7 @@ class InventarioController extends Controller
 
             if ($request->has('search')) {
                 $query->where('nombre', 'like', "%{$request->search}%")
-                      ->orWhere('codigoProducto', 'like', "%{$request->search}%");
+                    ->orWhere('codigoProducto', 'like', "%{$request->search}%");
             }
 
             $productos = $query->orderBy('nombre')->paginate(15);
@@ -39,7 +39,6 @@ class InventarioController extends Controller
                 'success' => true,
                 'data' => $productos
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -59,7 +58,8 @@ class InventarioController extends Controller
             'stock' => 'required|integer|min:0',
             'stockMinimo' => 'required|integer|min:0',
             'estado' => 'required|in:activo,inactivo',
-            'idCategoria' => 'required|exists:categoria,idCategoria'
+            'idCategoria' => 'required|exists:categoria,idCategoria',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         if ($validator->fails()) {
@@ -69,15 +69,33 @@ class InventarioController extends Controller
             ], 422);
         }
 
-        try {
-            $producto = Producto::create($request->all());
+    try {
+        // Crear array de datos
+        $data = $request->except(['imagen']);
+
+        // Manejar imagen si existe
+        if ($request->hasFile('imagen') && $request->file('imagen')->isValid()) {
+            $imagen = $request->file('imagen');
+            
+            // Generar nombre único para evitar colisiones
+            $extension = $imagen->getClientOriginalExtension();
+            $nombreArchivo = 'producto_' . time() . '_' . uniqid() . '.' . $extension;
+            
+            // Guardar en storage/public/productos
+            $path = $imagen->storeAs('productos', $nombreArchivo, 'public');
+            
+            // IMPORTANTE: Guardar la ruta en el campo 'imagenURL' (como en tu migración)
+            $data['imagenURL'] = $path; // Esto guardará algo como: 'productos/producto_123456789_abc123.jpg'
+        }
+            $producto = Producto::create($data);
+
+            $producto->imagen_completa = $producto->imagenURL ? asset('storage/' . $producto->imagenURL) : null;
 
             return response()->json([
                 'success' => true,
                 'message' => 'Producto creado correctamente',
                 'data' => $producto
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -87,21 +105,21 @@ class InventarioController extends Controller
         }
     }
 
-    public function showProducto($id){
-        try{
+    public function showProducto($id)
+    {
+        try {
             $producto = Producto::with('categoria')->findOrFail($id);
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $producto
             ], 200);
-            
-        } catch (ModelNotFoundException $e){
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
                 'error' => 'Producto no encontrado'
             ], 404);
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'error' => 'Error al obtener el producto',
@@ -124,7 +142,8 @@ class InventarioController extends Controller
                 'stock' => 'required|integer|min:0',
                 'stockMinimo' => 'required|integer|min:0',
                 'estado' => 'required|in:activo,inactivo',
-                'idCategoria' => 'required|exists:categoria,idCategoria'
+                'idCategoria' => 'required|exists:categoria,idCategoria',
+                'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
 
             if ($validator->fails()) {
@@ -134,14 +153,27 @@ class InventarioController extends Controller
                 ], 422);
             }
 
-            $producto->update($request->all());
+            if ($request->hasFile('imagen')) {
+                if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
+                    Storage::disk('public')->delete($producto->imagen);
+                }
+                $path = $request->file('imagen')->store('productos', 'public');
+                $data['imagenURL'] = $path;
+            } elseif ($request->has('eliminar_imagen') && $request->eliminar_imagen) {
+                if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
+                    Storage::disk('public')->delete($producto->imagen);
+                }
+                $data['imagenURL'] = null;
+            }
+
+
+            $producto->update($data);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Producto actualizado correctamente',
                 'data' => $producto
             ], 200);
-
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -160,7 +192,7 @@ class InventarioController extends Controller
     {
         try {
             $producto = Producto::findOrFail($id);
-            
+
             if ($producto->detalleVentas()->exists() || $producto->detalleCompras()->exists()) {
                 return response()->json([
                     'success' => false,
@@ -174,7 +206,6 @@ class InventarioController extends Controller
                 'success' => true,
                 'message' => 'Producto eliminado correctamente'
             ], 200);
-
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -201,7 +232,6 @@ class InventarioController extends Controller
                 'message' => 'Reporte generado correctamente',
                 'data' => $productos
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -220,7 +250,6 @@ class InventarioController extends Controller
                 'success' => true,
                 'data' => $categorias
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -252,7 +281,6 @@ class InventarioController extends Controller
                 'message' => 'Categoría creada correctamente',
                 'data' => $categoria
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -286,7 +314,6 @@ class InventarioController extends Controller
                 'message' => 'Categoría actualizada correctamente',
                 'data' => $categoria
             ], 200);
-
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -305,7 +332,7 @@ class InventarioController extends Controller
     {
         try {
             $categoria = Categoria::findOrFail($id);
-            
+
             if ($categoria->productos()->exists()) {
                 return response()->json([
                     'success' => false,
@@ -319,7 +346,6 @@ class InventarioController extends Controller
                 'success' => true,
                 'message' => 'Categoría eliminada correctamente'
             ], 200);
-
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -342,7 +368,6 @@ class InventarioController extends Controller
                 'success' => true,
                 'data' => $producto
             ], 200);
-
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -356,7 +381,7 @@ class InventarioController extends Controller
             ], 500);
         }
     }
-    
+
 
     //MOVIMIENTOS
     public function indexMovimientos(Request $request)
@@ -375,27 +400,26 @@ class InventarioController extends Controller
 
         return response()->json($movimientos);
     }
-    public function showMovimiento($id){
-        try{
-            $movimiento=MovimientoInventario::with('empleado.persona', 'producto')->findOrFail($id);
+    public function showMovimiento($id)
+    {
+        try {
+            $movimiento = MovimientoInventario::with('empleado.persona', 'producto')->findOrFail($id);
 
             return response()->json([
-                'success'=> true,
-                'data' =>$movimiento
+                'success' => true,
+                'data' => $movimiento
             ], 200);
-            
-        }catch (ModelNotFoundException $e){
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'error'=>'Movimiento no encontrado',
+                'error' => 'Movimiento no encontrado',
             ], 404);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'error'=>'Error al obtener al Movimiento',
-                'details'=> $e->getMessage()
+                'error' => 'Error al obtener al Movimiento',
+                'details' => $e->getMessage()
             ], 500);
         }
     }

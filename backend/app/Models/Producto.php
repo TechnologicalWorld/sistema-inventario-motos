@@ -21,7 +21,8 @@ class Producto extends Model
         'stock',
         'stockMinimo',
         'estado',
-        'idCategoria'
+        'idCategoria',
+        "imagenURL"
     ];
 
     protected $casts = [
